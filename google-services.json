@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "814782007721",
+    "project_id": "gerenciapet-fc1b2",
+    "storage_bucket": "gerenciapet-fc1b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814782007721:android:74cd4659a23aab61cfdcb8",
+        "android_client_info": {
+          "package_name": "com.univates.gerenciapet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "814782007721-jt5398lm0sgtfcmhnv5mq5uebqh4uj9i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCikf3DPtxq5aiyBUr-2U-45z10xSUgJoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "814782007721-jt5398lm0sgtfcmhnv5mq5uebqh4uj9i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

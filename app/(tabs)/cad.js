@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { auth } from '../../config/firebaseConfig.js';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -23,7 +24,7 @@ export default function SignupScreen({ navigation }) {
       return;
     }
 
-    auth.createUserWithEmailAndPassword(email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then(userCredential => {
         console.log('Usuário registrado com sucesso:', userCredential.user);
         Alert.alert('Sucesso', 'Usuário registrado com sucesso!');
