@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { auth } from 'D:\app_expo\app_expo_celke\app\firebaseConfig';
+import { auth } from '../../config/firebaseConfig.js';
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
