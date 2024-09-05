@@ -30,7 +30,7 @@ export default function SignupScreen() {
       .then(userCredential => {
         console.log('Usuário registrado com sucesso:', userCredential.user);
         Alert.alert('Sucesso', 'Usuário registrado com sucesso!');
-        navigation.navigate('login');
+        navigation.navigate('index');
       })
       .catch(error => {
         console.error('Erro ao registrar:', error);
@@ -64,7 +64,7 @@ export default function SignupScreen() {
         secureTextEntry
       />
       <Button title="Cadastrar" onPress={handleSignup} />
-      <Button title="Já tem uma conta? Faça login" onPress={() => navigation.navigate('login')} color="grey" />
+      <Button title="Já tem uma conta? Faça login" onPress={() => navigation.navigate('index')} color="grey" />
     </View>
   );
 }
