@@ -1,21 +1,35 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import { auth } from '../../config/firebaseConfig'; // Atualize o caminho conforme necessário
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation(); // Usar o hook useNavigation
 
   const handleLogin = () => {
-    // Lógica para login
-    console.log('Login:', email, password);
-    // Navegar para a tela inicial
-    navigation.navigate('Home');
-  };
+    if (!email.includes('@')) {
+      Alert.alert('Erro', 'Por favor, insira um email válido.');
+      return;
+    }
 
-  const handleSignup = () => {
-    // Lógica para cadastro
-    console.log('Cadastro:', email, password);
-    // Pode-se abrir uma nova tela para cadastro ou usar a mesma tela
+    if (password.length < 6) {
+      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Usuário logado com sucesso
+        console.log('Usuário logado com sucesso:', userCredential.user);
+        navigation.navigate('inicial'); // Navegar para a tela inicial
+      })
+      .catch((error) => {
+        console.error('Erro ao fazer login:', error);
+        Alert.alert('Erro', error.message); // Exibir mensagem de erro
+      });
   };
 
   return (
@@ -37,7 +51,11 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
       <Button title="Login" onPress={handleLogin} />
-      <Button title="Cadastrar" onPress={handleSignup} color="grey" />
+      <Button
+        title="Cadastrar"
+        onPress={() => navigation.navigate('cad')} // Navegar para a tela de cadastro
+        color="grey"
+      />
     </View>
   );
 }

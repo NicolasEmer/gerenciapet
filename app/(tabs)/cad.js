@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { auth } from '../../config/firebaseConfig.js';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';  // Importe o hook
 
-export default function SignupScreen({ navigation }) {
+export default function SignupScreen() {
+  const navigation = useNavigation();  // Use o hook para obter navigation
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,7 +30,7 @@ export default function SignupScreen({ navigation }) {
       .then(userCredential => {
         console.log('Usuário registrado com sucesso:', userCredential.user);
         Alert.alert('Sucesso', 'Usuário registrado com sucesso!');
-        navigation.navigate('Login');
+        navigation.navigate('login');
       })
       .catch(error => {
         console.error('Erro ao registrar:', error);
@@ -62,7 +64,7 @@ export default function SignupScreen({ navigation }) {
         secureTextEntry
       />
       <Button title="Cadastrar" onPress={handleSignup} />
-      <Button title="Já tem uma conta? Faça login" onPress={() => navigation.navigate('Login')} color="grey" />
+      <Button title="Já tem uma conta? Faça login" onPress={() => navigation.navigate('login')} color="grey" />
     </View>
   );
 }
