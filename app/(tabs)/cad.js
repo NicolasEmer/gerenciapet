@@ -63,8 +63,11 @@ export default function SignupScreen() {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-      <Button title="Cadastrar" onPress={handleSignup} />
-      <Button title="Já tem uma conta? Faça login" onPress={() => navigation.navigate('index')} color="grey" />
+      <View style={styles.buttonContainer}>
+        <Button title="Cadastrar" onPress={handleSignup} />
+        <View style={styles.buttonSpacing} />
+        <Button title="Já tem uma conta? Faça login" onPress={() => navigation.navigate('index')} color="grey" />
+      </View>
     </View>
   );
 }
@@ -88,5 +91,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     borderRadius: 4,
+  },
+  buttonContainer: {
+    marginTop: 16,
+  },
+  buttonSpacing: {
+    marginVertical: 8, // Espaçamento vertical entre os botões
   },
 });

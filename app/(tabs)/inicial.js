@@ -1,26 +1,28 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen({ navigation }) {
+  navigation = useNavigation();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo(a) à ONG de Animais</Text>
       <View style={styles.buttonContainer}>
         <Button
           title="Biblioteca de Animais"
-          onPress={() => navigation.navigate('Biblioteca')}
+          onPress={() => navigation.navigate('biblioteca')}
         />
       </View>
       <View style={styles.buttonContainer}>
         <Button
           title="Doações"
-          onPress={() => navigation.navigate('Doacoes')}
+          onPress={() => navigation.navigate('doacoes')}
         />
       </View>
       <View style={styles.buttonContainer}>
         <Button
           title="Eventos"
-          onPress={() => navigation.navigate('Eventos')}
+          onPress={() => navigation.navigate('eventos')}
         />
       </View>
     </View>

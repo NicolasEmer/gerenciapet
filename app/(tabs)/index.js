@@ -50,12 +50,15 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button
-        title="Cadastrar"
-        onPress={() => navigation.navigate('cad')} // Navegar para a tela de cadastro
-        color="grey"
-      />
+      <View style={styles.buttonContainer}>
+        <Button title="Login" onPress={handleLogin} />
+        <View style={styles.buttonSpacing} />
+        <Button
+          title="Cadastrar"
+          onPress={() => navigation.navigate('cad')} // Navegar para a tela de cadastro
+          color="grey"
+        />
+      </View>
     </View>
   );
 }
@@ -79,5 +82,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     borderRadius: 4,
+  },
+  buttonContainer: {
+    marginTop: 16,
+  },
+  buttonSpacing: {
+    marginVertical: 8, // Espaçamento vertical entre os botões
   },
 });
