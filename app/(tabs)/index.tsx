@@ -3,11 +3,18 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
 import { auth } from '../../config/firebaseConfig'; // Atualize o caminho conforme necessário
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+// Defina o tipo para a navegação
+type RootStackParamList = {
+  inicial: undefined;
+  cad: undefined;
+};
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigation = useNavigation(); // Usar o hook useNavigation
+  const [email, setEmail] = useState<string>(''); // Defina o tipo de estado como string
+  const [password, setPassword] = useState<string>(''); // Defina o tipo de estado como string
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>(); // Usar o hook useNavigation com tipagem
 
   const handleLogin = () => {
     if (!email.includes('@')) {

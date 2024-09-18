@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { auth } from '../../config/firebaseConfig.js';
+import { auth } from '../../config/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';  // Importe o hook
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+// Defina o tipo para a navegação
+type RootStackParamList = {
+  index: undefined;
+};
 
 export default function SignupScreen() {
-  const navigation = useNavigation();  // Use o hook para obter navigation
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // Defina o tipo de navegação usando NativeStackNavigationProp
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const [email, setEmail] = useState<string>('');  // Defina o tipo de estado como string
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
 
   const handleSignup = () => {
     if (!email.includes('@')) {
