@@ -1,5 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore'; // Importa o Firestore
+import { getStorage } from 'firebase/storage'; // Importa o Storage
 
 // Configurações do Firebase do seu projeto
 const firebaseConfig = {
@@ -17,4 +19,10 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 // Obtenha a instância do Firebase Auth
 const auth = getAuth(app);
 
-export { auth };
+// Obtenha a instância do Firestore
+const db = getFirestore(app);
+
+// Obtenha a instância do Storage
+const storage = getStorage(app); // Inicializa o Firebase Storage
+
+export { auth, db, storage };
