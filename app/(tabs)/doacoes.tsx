@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -15,19 +15,16 @@ const Doacoes: React.FC = () => {
   const [editingMethod, setEditingMethod] = useState<any>(null);
   const [viewingMethod, setViewingMethod] = useState<any>(null);
 
-  // Carrega métodos de pagamento ao carregar o componente
   useEffect(() => {
     fetchPaymentMethods();
   }, []);
 
-  // Função para carregar os métodos de pagamento
   const fetchPaymentMethods = async () => {
     const querySnapshot = await getDocs(collection(db, 'paymentMethods'));
     const methods = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     setPaymentMethods(methods);
   };
 
-  // Função para adicionar ou editar um método de pagamento
   const handleAddOrUpdatePaymentMethod = async () => {
     if (!paymentMethodName || !paymentMethodDescription) {
       Alert.alert('Erro', 'Preencha todos os campos.');
@@ -50,12 +47,10 @@ const Doacoes: React.FC = () => {
     };
 
     if (editingMethod) {
-      // Atualizar método de pagamento
       const methodRef = doc(db, 'paymentMethods', editingMethod.id);
       await updateDoc(methodRef, methodData);
       Alert.alert('Sucesso', 'Método atualizado com sucesso!');
     } else {
-      // Adicionar novo método de pagamento
       await addDoc(collection(db, 'paymentMethods'), methodData);
       Alert.alert('Sucesso', 'Método adicionado com sucesso!');
     }
@@ -65,10 +60,9 @@ const Doacoes: React.FC = () => {
     setPaymentMethodDescription('');
     setImage(null);
     setEditingMethod(null);
-    fetchPaymentMethods(); // Atualiza lista de métodos de pagamento
+    fetchPaymentMethods(); 
   };
 
-  // Função para escolher imagem
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -82,7 +76,6 @@ const Doacoes: React.FC = () => {
     }
   };
 
-  // Função para editar método de pagamento
   const handleEditMethod = (method: any) => {
     setEditingMethod(method);
     setPaymentMethodName(method.name);
@@ -91,14 +84,12 @@ const Doacoes: React.FC = () => {
     setModalVisible(true);
   };
 
-  // Função para deletar método de pagamento
   const handleDeleteMethod = async (id: string) => {
     await deleteDoc(doc(db, 'paymentMethods', id));
     Alert.alert('Sucesso', 'Método deletado com sucesso!');
-    fetchPaymentMethods(); // Atualiza lista de métodos de pagamento
+    fetchPaymentMethods(); 
   };
 
-  // Função para visualizar método de pagamento
   const handleViewMethod = (method: any) => {
     setViewingMethod(method);
     setViewModalVisible(true);
@@ -109,35 +100,34 @@ const Doacoes: React.FC = () => {
       {/* Adicionando imagem no topo */}
       <Image source={require('../../assets/images/doacoes.png')} style={styles.topImage} />
 
-      <View style={styles.itens}>
-        <FlatList
-          data={paymentMethods}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.methodContainer}>
-              <TouchableOpacity onPress={() => handleViewMethod(item)}>
-                <Image source={{ uri: item.image }} style={styles.qrImage} />
+      {/* Lista rolável de métodos de pagamento */}
+      <FlatList
+        data={paymentMethods}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.methodContainer}>
+            <TouchableOpacity onPress={() => handleViewMethod(item)}>
+              <Image source={{ uri: item.image }} style={styles.qrImage} />
+            </TouchableOpacity>
+            <Text style={styles.methodName}>{item.name}</Text>
+            <Text style={styles.methodDescription}>{item.description}</Text>
+
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity onPress={() => handleEditMethod(item)} style={styles.editButton}>
+                <Text style={styles.editButtonText}>Editar</Text>
               </TouchableOpacity>
-              <Text style={styles.methodName}>{item.name}</Text>
-              <Text style={styles.methodDescription}>{item.description}</Text>
-
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity onPress={() => handleEditMethod(item)} style={styles.editButton}>
-                  <Text style={styles.editButtonText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteMethod(item.id)} style={styles.deleteButton}>
-                  <Text style={styles.deleteButtonText}>Deletar</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity onPress={() => handleDeleteMethod(item.id)} style={styles.deleteButton}>
+                <Text style={styles.deleteButtonText}>Deletar</Text>
+              </TouchableOpacity>
             </View>
-          )}
-        />
-
-        {/* Botão para adicionar novo método de pagamento */}
-        <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-          <Text style={styles.addButtonText}>Adicionar Método de Pagamento</Text>
-        </TouchableOpacity>
-      </View>
+          </View>
+        )}
+        ListFooterComponent={
+          <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+            <Text style={styles.addButtonText}>Adicionar Método de Pagamento</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Modal para visualizar método de pagamento */}
       <Modal animationType="slide" transparent={true} visible={viewModalVisible} onRequestClose={() => setViewModalVisible(false)}>
@@ -185,6 +175,8 @@ const Doacoes: React.FC = () => {
                 <Text style={styles.saveButtonText}>Salvar</Text>
               </TouchableOpacity>
 
+              <View style={styles.buttonSpacing} />
+
               <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
@@ -199,20 +191,17 @@ const Doacoes: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#FFF',
   },
   topImage: {
-    width: '100%',
-    height: 200,
+    width: '90%',
+    height: 250,
     resizeMode: 'contain',
-  },
-  itens: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 10,
+    marginTop:50,
   },
   methodContainer: {
     backgroundColor: '#f9f9f9',
@@ -327,6 +316,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+    width: '100%',
   },
   saveButton: {
     backgroundColor: '#28a745',
@@ -347,6 +337,9 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: '#FFF',
     fontSize: 16,
+  },
+  buttonSpacing: {
+    width: 10, // Espaço entre os botões
   },
 });
 
