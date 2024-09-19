@@ -1,51 +1,300 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../../config/firebaseConfig'; // Importa a configuração Firebase
 
 const Doacoes: React.FC = () => {
-    return (
-        <View style={styles.itens}>
-            <View style={styles.qrcode}>
-                <Image
-                    source={{ uri: 'https://via.placeholder.com/150.png?text=QR+Code' }} // Replace with your QR code URL
-                    style={styles.qrImage}
-                />
+  const [modalVisible, setModalVisible] = useState(false);
+  const [paymentMethodName, setPaymentMethodName] = useState('');
+  const [paymentMethodDescription, setPaymentMethodDescription] = useState('');
+  const [image, setImage] = useState<string | null>(null);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  const [editingMethod, setEditingMethod] = useState<any>(null);
+
+  // Carrega métodos de pagamento ao carregar o componente
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, []);
+
+  // Função para carregar os métodos de pagamento
+  const fetchPaymentMethods = async () => {
+    const querySnapshot = await getDocs(collection(db, 'paymentMethods'));
+    const methods = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    setPaymentMethods(methods);
+  };
+
+  // Função para adicionar ou editar um método de pagamento
+  const handleAddOrUpdatePaymentMethod = async () => {
+    if (!paymentMethodName || !paymentMethodDescription) {
+      Alert.alert('Erro', 'Preencha todos os campos.');
+      return;
+    }
+
+    let imageUrl = '';
+    if (image) {
+      const imageRef = ref(storage, `images/${paymentMethodName}_${Date.now()}.jpg`);
+      const img = await fetch(image);
+      const bytes = await img.blob();
+      await uploadBytes(imageRef, bytes);
+      imageUrl = await getDownloadURL(imageRef);
+    }
+
+    const methodData = {
+      name: paymentMethodName,
+      description: paymentMethodDescription,
+      image: imageUrl,
+    };
+
+    if (editingMethod) {
+      // Atualizar método de pagamento
+      const methodRef = doc(db, 'paymentMethods', editingMethod.id);
+      await updateDoc(methodRef, methodData);
+      Alert.alert('Sucesso', 'Método atualizado com sucesso!');
+    } else {
+      // Adicionar novo método de pagamento
+      await addDoc(collection(db, 'paymentMethods'), methodData);
+      Alert.alert('Sucesso', 'Método adicionado com sucesso!');
+    }
+
+    setModalVisible(false);
+    setPaymentMethodName('');
+    setPaymentMethodDescription('');
+    setImage(null);
+    setEditingMethod(null);
+    fetchPaymentMethods(); // Atualiza lista de métodos de pagamento
+  };
+
+  // Função para escolher imagem
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  // Função para editar método de pagamento
+  const handleEditMethod = (method: any) => {
+    setEditingMethod(method);
+    setPaymentMethodName(method.name);
+    setPaymentMethodDescription(method.description);
+    setImage(method.image);
+    setModalVisible(true);
+  };
+
+  // Função para deletar método de pagamento
+  const handleDeleteMethod = async (id: string) => {
+    await deleteDoc(doc(db, 'paymentMethods', id));
+    Alert.alert('Sucesso', 'Método deletado com sucesso!');
+    fetchPaymentMethods(); // Atualiza lista de métodos de pagamento
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.itens}>
+        <FlatList
+          data={paymentMethods}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.methodContainer}>
+              <Image source={{ uri: item.image }} style={styles.qrImage} />
+              <Text style={styles.methodName}>{item.name}</Text>
+              <Text style={styles.methodDescription}>{item.description}</Text>
+
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity onPress={() => handleEditMethod(item)} style={styles.editButton}>
+                  <Text style={styles.editButtonText}>Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDeleteMethod(item.id)} style={styles.deleteButton}>
+                  <Text style={styles.deleteButtonText}>Deletar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.text}>
-                <Text>Text</Text>
+          )}
+        />
+
+        {/* Botão para adicionar novo método de pagamento */}
+        <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+          <Text style={styles.addButtonText}>Adicionar Método de Pagamento</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal para adicionar ou editar método de pagamento */}
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{editingMethod ? 'Editar Método de Pagamento' : 'Novo Método de Pagamento'}</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Nome do Método"
+              value={paymentMethodName}
+              onChangeText={setPaymentMethodName}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Descrição do Método"
+              value={paymentMethodDescription}
+              onChangeText={setPaymentMethodDescription}
+            />
+
+            <Button title="Selecionar Imagem" onPress={pickImage} />
+            {image && <Image source={{ uri: image }} style={styles.selectedImage} />}
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.saveButton} onPress={handleAddOrUpdatePaymentMethod}>
+                <Text style={styles.saveButtonText}>Salvar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
             </View>
+          </View>
         </View>
-    );
+      </Modal>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    itens: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
-    },
-    qrcode: {
-        height: '35%',
-        aspectRatio: 1,
-        backgroundColor: 'lightgray',
-        marginBottom: 20,
-        borderRadius: 15,
-        alignItems: 'center', // Align children to center (flex: 1 required)
-        justifyContent: 'center', // Align children to center (flex: 1 required)
-    },
-    text: {
-        textAlign: 'center',
-        backgroundColor: 'lightgray',
-        padding: 10,
-        width: '50%',
-        borderRadius: 15,
-    },
-    qrImage: {
-        width: '100%',
-        height: '100%',
-    },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#FFF',
+  },
+  itens: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  methodContainer: {
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
+  qrImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
+    borderRadius: 8,
+  },
+  methodName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  methodDescription: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  editButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+  },
+  addButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 8,
+    width: '80%',
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  selectedImage: {
+    width: 100,
+    height: 100,
+    marginVertical: 10,
+    borderRadius: 8,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  saveButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  saveButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  cancelButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
 });
 
 export default Doacoes;
+

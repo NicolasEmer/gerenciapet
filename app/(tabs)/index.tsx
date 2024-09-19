@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
-import { auth } from '../../config/firebaseConfig'; // Atualize o caminho conforme necessário
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebaseConfig'; // Atualize conforme necessário
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FontAwesome } from '@expo/vector-icons';
 
 // Defina o tipo para a navegação
 type RootStackParamList = {
@@ -12,9 +13,9 @@ type RootStackParamList = {
 };
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState<string>(''); // Defina o tipo de estado como string
-  const [password, setPassword] = useState<string>(''); // Defina o tipo de estado como string
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>(); // Usar o hook useNavigation com tipagem
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleLogin = () => {
     if (!email.includes('@')) {
@@ -29,27 +30,37 @@ export default function LoginScreen() {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Usuário logado com sucesso
         console.log('Usuário logado com sucesso:', userCredential.user);
-        navigation.navigate('inicial'); // Navegar para a tela inicial
+        navigation.navigate('inicial');
       })
       .catch((error) => {
         console.error('Erro ao fazer login:', error);
-        Alert.alert('Erro', error.message); // Exibir mensagem de erro
+        Alert.alert('Erro', error.message);
       });
   };
 
   return (
     <View style={styles.container}>
+      {/* Logo */}
+      <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
+
+      {/* Título */}
       <Text style={styles.title}>Login</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('cad')}>
+        <Text style={styles.subtitle}>ou crie sua conta</Text>
+      </TouchableOpacity>
+
+      {/* Campo de Email */}
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="Nome de usuário ou email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
+      {/* Campo de Senha */}
       <TextInput
         style={styles.input}
         placeholder="Senha"
@@ -57,14 +68,28 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <View style={styles.buttonContainer}>
-        <Button title="Login" onPress={handleLogin} />
-        <View style={styles.buttonSpacing} />
-        <Button
-          title="Cadastrar"
-          onPress={() => navigation.navigate('cad')} // Navegar para a tela de cadastro
-          color="grey"
-        />
+
+      {/* Esqueci a Senha */}
+      <TouchableOpacity>
+        <Text style={styles.forgotPassword}>Esqueceu a Senha?</Text>
+      </TouchableOpacity>
+
+      {/* Botão de Login */}
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>Login</Text>
+      </TouchableOpacity>
+
+      {/* Divider */}
+      <Text style={styles.orText}>Ou entre com uma conta</Text>
+
+      {/* Login com Google e Facebook */}
+      <View style={styles.socialContainer}>
+        <TouchableOpacity style={styles.socialButton}>
+          <FontAwesome name="google" size={32} color="#DB4437" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton}>
+          <FontAwesome name="facebook" size={32} color="#4267B2" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -73,27 +98,74 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
+    backgroundColor: '#FFF',
     justifyContent: 'center',
-    padding: 16,
-    backgroundColor: '#f9f9f9',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: '#007BFF',
+    fontSize: 14,
+    marginBottom: 20,
   },
   input: {
-    height: 40,
+    width: '100%',
+    height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
     marginBottom: 12,
-    paddingHorizontal: 8,
-    borderRadius: 4,
   },
-  buttonContainer: {
-    marginTop: 16,
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    color: '#6e6e6e',
+    fontSize: 14,
+    marginBottom: 20,
   },
-  buttonSpacing: {
-    marginVertical: 8, // Espaçamento vertical entre os botões
+  loginButton: {
+    width: '100%',
+    backgroundColor: '#007BFF',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  loginButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  orText: {
+    color: '#6e6e6e',
+    marginVertical: 10,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '50%',
+  },
+  socialButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#f9f9f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
 });
+
