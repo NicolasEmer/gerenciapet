@@ -1,47 +1,53 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation'; // Adjust the import path as necessary
 
-export default function HomeScreen({ navigation }) {
-  navigation = useNavigation();
+type HomeScreenProps = {
+  navigation: NavigationProp<RootStackParamList, 'Home'>;
+};
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  navigation = useNavigation<NavigationProp<RootStackParamList, 'Home'>>();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo(a) à ONG de Animais</Text>
       <View style={styles.buttonContainer}>
         <Button
           title="Biblioteca de Animais"
-          onPress={() => navigation.navigate('biblioteca')}
+          onPress={() => navigation.navigate('Library')}
         />
       </View>
       <View style={styles.buttonContainer}>
         <Button
           title="Doações"
-          onPress={() => navigation.navigate('doacoes')}
+          onPress={() => navigation.navigate('Donations')}
         />
       </View>
       <View style={styles.buttonContainer}>
         <Button
           title="Eventos"
-          onPress={() => navigation.navigate('eventos')}
+          onPress={() => navigation.navigate('Events')}
         />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 16,
-    backgroundColor: '#f9f9f9',
   },
   title: {
     fontSize: 24,
     marginBottom: 16,
-    textAlign: 'center',
   },
   buttonContainer: {
-    marginVertical: 10, // Adiciona um espaço entre os botões
+    marginVertical: 8,
   },
 });
+
+export default HomeScreen;
