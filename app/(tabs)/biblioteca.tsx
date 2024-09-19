@@ -1,7 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation'; 
 
 export default function App() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const handleNavigateToCadastroAnimais = () => {
+    navigation.navigate('CreateAnimal');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
@@ -12,29 +21,34 @@ export default function App() {
         />
         {/* Text Local (Top right) */}
         <View style={styles.textBox}>
-          <Text>Text local Lorem ipsum dolor sit amet, 
-            consectetur adipiscing elit. 
-            Etiam eget ligula eu lectus lobortis condimentum. 
-            Aliquam nonummy auctor massa. Pellentesque habitant morbi 
-            tristique senectus et netus et malesuada fames ac turpis egestas. 
-            Nulla at risus. Quisque purus magna, auctor et, sagittis ac, 
-            posuere eu, lectus. Nam mattis, felis ut adipiscing.</Text>
+          <Text>
+            Text local Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+            Etiam eget ligula eu lectus lobortis condimentum. Aliquam nonummy 
+            auctor massa. Pellentesque habitant morbi tristique senectus et 
+            netus et malesuada fames ac turpis egestas. Nulla at risus. 
+            Quisque purus magna, auctor et, sagittis ac, posuere eu, lectus. 
+            Nam mattis, felis ut adipiscing.
+          </Text>
         </View>
       </View>
 
       {/* Bottom Text Local */}
       <View style={styles.largeTextBox}>
-        <Text>Text local Lorem ipsum dolor sit amet, 
-            consectetur adipiscing elit. 
-            Etiam eget ligula eu lectus lobortis condimentum. 
-            Aliquam nonummy auctor massa. Pellentesque habitant morbi 
-            tristique senectus et netus et malesuada fames ac turpis egestas. 
-            Nulla at risus. Quisque purus magna, auctor et, sagittis ac, 
-            posuere eu, lectus. Nam mattis, felis ut adipiscing.</Text>
+        <Text>
+          Text local Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+          Etiam eget ligula eu lectus lobortis condimentum. Aliquam nonummy 
+          auctor massa. Pellentesque habitant morbi tristique senectus et 
+          netus et malesuada fames ac turpis egestas. Nulla at risus. 
+          Quisque purus magna, auctor et, sagittis ac, posuere eu, lectus. 
+          Nam mattis, felis ut adipiscing.
+        </Text>
       </View>
 
       {/* Floating Button */}
-      <TouchableOpacity style={styles.floatingButton}>
+      <TouchableOpacity 
+        style={styles.floatingButton} 
+        onPress={handleNavigateToCadastroAnimais}
+      >
         <Text style={styles.buttonText}>☰</Text>
       </TouchableOpacity>
     </View>

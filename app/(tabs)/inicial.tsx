@@ -1,29 +1,31 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation'; // Adjust the import path as necessary
 
 type HomeScreenProps = {
-  navigation: NavigationProp<RootStackParamList, 'Home'>;
+  navigation: NavigationProp<RootStackParamList>;
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  navigation = useNavigation<NavigationProp<RootStackParamList, 'Home'>>();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo(a) à ONG de Animais</Text>
+
       <View style={styles.buttonContainer}>
         <Button
           title="Biblioteca de Animais"
           onPress={() => navigation.navigate('Library')}
         />
       </View>
+
       <View style={styles.buttonContainer}>
         <Button
           title="Doações"
           onPress={() => navigation.navigate('Donations')}
         />
       </View>
+
       <View style={styles.buttonContainer}>
         <Button
           title="Eventos"

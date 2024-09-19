@@ -4,6 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import CreateAnimalScreen from './animais/create-animais';
 import HomeScreen from './(tabs)/inicial';
 import LoginScreen from './(tabs)/index';
+import LibraryScreen from './(tabs)/biblioteca';
+import DonationsScreen from './(tabs)/doacoes';
+import EventsScreen from './(tabs)/eventos';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -34,7 +37,22 @@ function Navigation() {
         <Stack.Screen
           name="Index"
           component={LoginScreen}
-          options={{ title: 'Cadastro de Animais' }}
+          options={{ title: 'Login' }}
+        />
+        <Stack.Screen
+          name="Library"
+          component={LibraryScreen}
+          options={{ title: 'View do Animal' }}
+        />
+        <Stack.Screen
+          name="Donations"
+          component={DonationsScreen}
+          options={{ title: 'Doações' }}
+        />
+        <Stack.Screen
+          name="Events"
+          component={EventsScreen}
+          options={{ title: 'Eventos' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

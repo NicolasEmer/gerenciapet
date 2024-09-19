@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation';  // Importe o tipo RootStackParamList
+import { RootStackParamList } from '../navigation';
 
 export default function AnimalRegistrationScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateAnimal'>>();
