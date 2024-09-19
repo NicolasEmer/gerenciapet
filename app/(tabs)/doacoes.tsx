@@ -7,11 +7,13 @@ import { db, storage } from '../../config/firebaseConfig'; // Importa a configur
 
 const Doacoes: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
   const [paymentMethodName, setPaymentMethodName] = useState('');
   const [paymentMethodDescription, setPaymentMethodDescription] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [editingMethod, setEditingMethod] = useState<any>(null);
+  const [viewingMethod, setViewingMethod] = useState<any>(null);
 
   // Carrega métodos de pagamento ao carregar o componente
   useEffect(() => {
@@ -96,15 +98,26 @@ const Doacoes: React.FC = () => {
     fetchPaymentMethods(); // Atualiza lista de métodos de pagamento
   };
 
+  // Função para visualizar método de pagamento
+  const handleViewMethod = (method: any) => {
+    setViewingMethod(method);
+    setViewModalVisible(true);
+  };
+
   return (
     <View style={styles.container}>
+      {/* Adicionando imagem no topo */}
+      <Image source={require('../../assets/images/doacoes.png')} style={styles.topImage} />
+
       <View style={styles.itens}>
         <FlatList
           data={paymentMethods}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.methodContainer}>
-              <Image source={{ uri: item.image }} style={styles.qrImage} />
+              <TouchableOpacity onPress={() => handleViewMethod(item)}>
+                <Image source={{ uri: item.image }} style={styles.qrImage} />
+              </TouchableOpacity>
               <Text style={styles.methodName}>{item.name}</Text>
               <Text style={styles.methodDescription}>{item.description}</Text>
 
@@ -125,6 +138,24 @@ const Doacoes: React.FC = () => {
           <Text style={styles.addButtonText}>Adicionar Método de Pagamento</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Modal para visualizar método de pagamento */}
+      <Modal animationType="slide" transparent={true} visible={viewModalVisible} onRequestClose={() => setViewModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {viewingMethod && (
+              <>
+                <Image source={{ uri: viewingMethod.image }} style={styles.expandedImage} />
+                <Text style={styles.modalTitle}>{viewingMethod.name}</Text>
+                <Text style={styles.methodDescription}>{viewingMethod.description}</Text>
+              </>
+            )}
+            <TouchableOpacity style={styles.closeButton} onPress={() => setViewModalVisible(false)}>
+              <Text style={styles.closeButtonText}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal para adicionar ou editar método de pagamento */}
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
@@ -173,6 +204,11 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#FFF',
   },
+  topImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'contain',
+  },
   itens: {
     width: '100%',
     justifyContent: 'center',
@@ -209,33 +245,34 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: '#007bff',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-  editButtonText: {
-    color: '#FFF',
-    fontSize: 14,
-  },
-  deleteButton: {
-    backgroundColor: '#dc3545',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-  deleteButtonText: {
-    color: '#FFF',
-    fontSize: 14,
-  },
-  addButton: {
-    backgroundColor: '#007BFF',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
-  addButtonText: {
+  editButtonText: {
     color: '#FFF',
     fontSize: 16,
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  addButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 18,
   },
   modalContainer: {
     flex: 1,
@@ -244,11 +281,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    width: '90%',
     backgroundColor: '#FFF',
     padding: 20,
-    borderRadius: 8,
-    width: '80%',
-    elevation: 5,
+    borderRadius: 10,
+    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 20,
@@ -256,8 +293,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
+    width: '100%',
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#CCC',
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
@@ -268,6 +306,22 @@ const styles = StyleSheet.create({
     height: 100,
     marginVertical: 10,
     borderRadius: 8,
+  },
+  expandedImage: {
+    width: 250,
+    height: 250,
+    marginBottom: 20,
+    borderRadius: 8,
+  },
+  closeButton: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: '#FFF',
+    fontSize: 16,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -297,4 +351,3 @@ const styles = StyleSheet.create({
 });
 
 export default Doacoes;
-
