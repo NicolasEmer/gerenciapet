@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../config/firebaseConfig';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, Image, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native';
+import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { db, storage } from '../../config/firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
 
 interface Animal {
   id: string;
   name: string;
   type: string;
-  image: string;
+  breed: string;
+  gender: string;
+  age: string;
+  isVaccinated: boolean;
+  isCastrated: boolean;
   description: string;
+  adoptionStatus: string;
+  image: string;
 }
 
 export default function AnimalListScreen() {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+  const [updatedAnimal, setUpdatedAnimal] = useState<Partial<Animal>>({});
+  const [image, setImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAnimals();
@@ -38,7 +49,59 @@ export default function AnimalListScreen() {
 
   const handleViewAnimal = (animal: Animal) => {
     setSelectedAnimal(animal);
+    setUpdatedAnimal(animal);
+    setImage(animal.image);
     setModalVisible(true);
+    setEditMode(false);
+  };
+
+  const handleDeleteAnimal = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'animals', id));
+      setAnimals(animals.filter((animal) => animal.id !== id));
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Erro ao deletar animal:', error);
+    }
+  };
+
+  const handleEditAnimal = () => {
+    setEditMode(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (selectedAnimal && updatedAnimal) {
+      try {
+        let imageUrl = selectedAnimal.image;
+        if (image && image !== selectedAnimal.image) {
+          const imageRef = ref(storage, `animals/${selectedAnimal.name}_${Date.now()}.jpg`);
+          const img = await fetch(image);
+          const bytes = await img.blob();
+          await uploadBytes(imageRef, bytes);
+          imageUrl = await getDownloadURL(imageRef);
+        }
+
+        const animalRef = doc(db, 'animals', selectedAnimal.id);
+        await updateDoc(animalRef, { ...updatedAnimal, image: imageUrl });
+        fetchAnimals();
+        setModalVisible(false);
+      } catch (error) {
+        console.error('Erro ao atualizar animal:', error);
+      }
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
   };
 
   const renderItem = ({ item }: { item: Animal }) => (
@@ -62,18 +125,107 @@ export default function AnimalListScreen() {
         />
       )}
 
-      {/* Modal de visualização de animal */}
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {selectedAnimal && (
+            {selectedAnimal && !editMode && (
               <>
                 <Image source={{ uri: selectedAnimal.image }} style={styles.expandedImage} />
                 <Text style={styles.modalTitle}>{selectedAnimal.name}</Text>
                 <Text style={styles.modalType}>{selectedAnimal.type}</Text>
                 <Text style={styles.modalDescription}>{selectedAnimal.description}</Text>
+                <Text>Raça: {selectedAnimal.breed}</Text>
+                <Text>Gênero: {selectedAnimal.gender}</Text>
+                <Text>Idade: {selectedAnimal.age}</Text>
+                <Text>Vacinação: {selectedAnimal.isVaccinated ? 'Sim' : 'Não'}</Text>
+                <Text>Castração: {selectedAnimal.isCastrated ? 'Sim' : 'Não'}</Text>
+                <Text>Status de adoção: {selectedAnimal.adoptionStatus}</Text>
+
+                <TouchableOpacity style={styles.editButton} onPress={handleEditAnimal}>
+                  <Text style={styles.editButtonText}>Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteAnimal(selectedAnimal.id)}>
+                  <Text style={styles.deleteButtonText}>Deletar</Text>
+                </TouchableOpacity>
               </>
             )}
+
+            {selectedAnimal && editMode && (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nome do Animal"
+                  value={updatedAnimal.name}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, name: text })}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Tipo do Animal"
+                  value={updatedAnimal.type}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, type: text })}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Raça"
+                  value={updatedAnimal.breed}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, breed: text })}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Gênero"
+                  value={updatedAnimal.gender}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, gender: text })}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Idade"
+                  value={updatedAnimal.age}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, age: text })}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Descrição"
+                  value={updatedAnimal.description}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, description: text })}
+                />
+
+                <TouchableOpacity onPress={pickImage}>
+                  <Text style={styles.buttonText}>Selecionar Imagem</Text>
+                </TouchableOpacity>
+                {image && <Image source={{ uri: image }} style={styles.image} />}
+
+                <View style={styles.checkboxContainer}>
+                  <Text>Vacinação:</Text>
+                  <TouchableOpacity onPress={() => setUpdatedAnimal({ ...updatedAnimal, isVaccinated: !updatedAnimal.isVaccinated })}>
+                    <Text style={updatedAnimal.isVaccinated ? styles.checked : styles.unchecked}>
+                      {updatedAnimal.isVaccinated ? 'Sim' : 'Não'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.checkboxContainer}>
+                  <Text>Castração:</Text>
+                  <TouchableOpacity onPress={() => setUpdatedAnimal({ ...updatedAnimal, isCastrated: !updatedAnimal.isCastrated })}>
+                    <Text style={updatedAnimal.isCastrated ? styles.checked : styles.unchecked}>
+                      {updatedAnimal.isCastrated ? 'Sim' : 'Não'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Status de Adoção"
+                  value={updatedAnimal.adoptionStatus}
+                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, adoptionStatus: text })}
+                />
+
+                <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
+                  <Text style={styles.saveButtonText}>Salvar</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButtonText}>Fechar</Text>
             </TouchableOpacity>
@@ -84,82 +236,157 @@ export default function AnimalListScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    backgroundColor: '#f9f9f9',
+    paddingTop: 20,  // Adicionado para mover a lista um pouco mais para baixo
   },
   listContainer: {
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    marginTop: 20, // Aumentando o espaçamento para que os itens da lista fiquem mais abaixo
   },
   animalContainer: {
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 8,
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
+    marginBottom: 12,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   animalImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
-    borderRadius: 8,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 12,
   },
   animalName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   animalType: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#777',
-    marginBottom: 10,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: '90%',
-    backgroundColor: '#FFF',
-    padding: 20,
+    width: '85%', // Diminuímos o tamanho do modal para 85% da largura da tela
+    height: '85%', // Diminuímos o tamanho do modal para 85% da altura da tela
+    backgroundColor: '#fff',
     borderRadius: 10,
-    alignItems: 'center',
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   expandedImage: {
-    width: 250,
-    height: 250,
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
     marginBottom: 20,
-    borderRadius: 8,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 10,
   },
   modalType: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 10,
-  },
-  modalDescription: {
-    fontSize: 14,
-    color: '#777',
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#666',
     marginBottom: 20,
   },
-  closeButton: {
-    backgroundColor: '#dc3545',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  modalDescription: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  checked: {
+    color: 'green',
+    fontWeight: 'bold',
+  },
+  unchecked: {
+    color: 'red',
+    fontWeight: 'bold',
+  },
+  buttonText: {
+    color: '#007bff',
+    marginBottom: 12,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginVertical: 10,
     borderRadius: 8,
   },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  editButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+    padding: 10,
+    borderRadius: 5,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: '#888',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
   closeButtonText: {
-    color: '#FFF',
-    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
+
