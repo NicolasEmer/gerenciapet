@@ -1,27 +1,95 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, Button, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../config/firebaseConfig';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation';
 
-export default function App() {
+interface Evento {
+  id: string;
+  nome: string;
+  data: string;
+  local: string;
+  imageUrl?: string;
+}
+
+export default function Eventos() {
+  const [eventos, setEventos] = useState<Evento[]>([]);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Events'>>();
+
+  useEffect(() => {
+    const carregarEventos = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'eventos'));
+        const eventosList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Evento[];
+        setEventos(eventosList);
+      } catch (error) {
+        Alert.alert("Erro", "Erro ao carregar eventos. Verifique a conexão.");
+        console.error("Erro ao carregar eventos: ", error);
+      }
+    };
+
+    carregarEventos();
+  }, []);
+
+  const excluirEvento = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'eventos', id));
+      setEventos(eventos.filter(evento => evento.id !== id));
+      Alert.alert("Sucesso", "Evento excluído com sucesso.");
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao excluir evento. Verifique a conexão.");
+      console.error("Erro ao excluir evento: ", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.topRow}>
-        {/* Image Local */}
-        <Image 
-          style={styles.imageBox} 
-          source={{ uri: 'https://via.placeholder.com/150.png?text=Image' }} 
-        />
-      </View>
+      <Text style={styles.title}>Eventos</Text>
+      <FlatList
+        data={eventos}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.eventItem}>
+            {item.imageUrl ? (
+              <Image source={{ uri: item.imageUrl }} style={styles.imageBox} />
+            ) : (
+              <Image 
+                source={{ uri: 'https://via.placeholder.com/150.png?text=Sem+Imagem' }} 
+                style={styles.imageBox} 
+              />
+            )}
 
-      {/* Bottom Text Local */}
-      <View style={styles.largeTextBox}>
-        <Text>Text local Lorem ipsum dolor sit amet, 
-            consectetur adipiscing elit. 
-            Etiam eget ligula eu lectus lobortis condimentum. 
-            Aliquam nonummy auctor massa. Pellentesque habitant morbi 
-            tristique senectus et netus et malesuada fames ac turpis egestas. 
-            Nulla at risus. Quisque purus magna, auctor et, sagittis ac, 
-            posuere eu, lectus. Nam mattis, felis ut adipiscing.</Text>
-      </View>
+            <View style={styles.eventInfo}>
+              <Text style={styles.eventText}>Nome: {item.nome}</Text>
+              <Text style={styles.eventText}>Data: {item.data}</Text>
+              <Text style={styles.eventText}>Local: {item.local}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate('EditarEvento', { id: item.id })}
+                >
+                  <Text style={styles.buttonText}>Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => excluirEvento(item.id)}
+                >
+                  <Text style={styles.buttonText}>Excluir</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+      />
+      <Button
+        title="Adicionar Evento"
+        onPress={() => navigation.navigate('AdicionarEvento')}
+      />
     </View>
   );
 }
@@ -30,26 +98,56 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'space-between',
-    marginTop: 30
+    backgroundColor: '#f0f0f0',
   },
-  topRow: {
-    flexDirection: 'row',
-    height: '48%',
-    justifyContent: 'space-between',
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
+  eventItem: {
+    flexDirection: 'row',
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
   imageBox: {
-    margin: 'auto',
-    width: '60%',
-    height: '100%', 
+    width: 100,
+    height: 100,
+    marginRight: 20,
     backgroundColor: '#ddd',
     borderRadius: 10,
   },
-  largeTextBox: {
-    width: '100%',
-    height: '48%',
-    backgroundColor: '#ddd',
-    borderRadius: 10
+  eventInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  eventText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  editButton: {
+    backgroundColor: '#4caf50',
+    padding: 10,
+    marginRight: 10,
+    borderRadius: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#f44336',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

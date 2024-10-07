@@ -7,6 +7,8 @@ import LoginScreen from './(tabs)/index';
 import LibraryScreen from './(tabs)/biblioteca';
 import DonationsScreen from './(tabs)/doacoes';
 import EventsScreen from './(tabs)/eventos';
+import AdicionarEvento from './(tabs)/AdicionarEvento';
+import EditarEvento from './(tabs)/EditarEvento';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -15,7 +17,8 @@ export type RootStackParamList = {
   Library: undefined;
   Donations: undefined;
   Events: undefined;
-  Cad: undefined;
+  AdicionarEvento: undefined;
+  EditarEvento: { id: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,6 +56,16 @@ function Navigation() {
           name="Events"
           component={EventsScreen}
           options={{ title: 'Eventos' }}
+        />
+        <Stack.Screen
+          name="AdicionarEvento"
+          component={AdicionarEvento}
+          options={{ title: 'Adicionar Evento' }}
+        />
+        <Stack.Screen
+          name="EditarEvento"
+          component={EditarEvento}
+          options={{ title: 'Editar Evento' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
