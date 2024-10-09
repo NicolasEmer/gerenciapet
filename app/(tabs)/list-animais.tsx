@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, FlatList, Image, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, Image, TouchableOpacity, Modal, ActivityIndicator, ScrollView } from 'react-native';
 import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from '../../config/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
+import { Picker } from '@react-native-picker/picker';
 
 interface Animal {
   id: string;
@@ -17,6 +18,7 @@ interface Animal {
   description: string;
   adoptionStatus: string;
   image: string;
+  size: string;
 }
 
 export default function AnimalListScreen() {
@@ -107,8 +109,11 @@ export default function AnimalListScreen() {
   const renderItem = ({ item }: { item: Animal }) => (
     <TouchableOpacity style={styles.animalContainer} onPress={() => handleViewAnimal(item)}>
       <Image source={{ uri: item.image }} style={styles.animalImage} />
-      <Text style={styles.animalName}>{item.name}</Text>
-      <Text style={styles.animalType}>{item.type}</Text>
+      <View style={styles.animalInfo}>
+        <Text style={styles.animalName}>{item.name}</Text>
+        <Text style={styles.animalType}>{item.type}</Text>
+        <Text style={styles.animalSize}>Porte: {item.size}</Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -128,107 +133,120 @@ export default function AnimalListScreen() {
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {selectedAnimal && !editMode && (
-              <>
-                <Image source={{ uri: selectedAnimal.image }} style={styles.expandedImage} />
-                <Text style={styles.modalTitle}>{selectedAnimal.name}</Text>
-                <Text style={styles.modalType}>{selectedAnimal.type}</Text>
-                <Text style={styles.modalDescription}>{selectedAnimal.description}</Text>
-                <Text>Raça: {selectedAnimal.breed}</Text>
-                <Text>Gênero: {selectedAnimal.gender}</Text>
-                <Text>Idade: {selectedAnimal.age}</Text>
-                <Text>Vacinação: {selectedAnimal.isVaccinated ? 'Sim' : 'Não'}</Text>
-                <Text>Castração: {selectedAnimal.isCastrated ? 'Sim' : 'Não'}</Text>
-                <Text>Status de adoção: {selectedAnimal.adoptionStatus}</Text>
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+              {selectedAnimal && !editMode && (
+                <>
+                  <Image source={{ uri: selectedAnimal.image }} style={styles.expandedImage} />
+                  <Text style={styles.modalTitle}>{selectedAnimal.name}</Text>
+                  <Text style={styles.modalType}>{selectedAnimal.type}</Text>
+                  <Text style={styles.modalDescription}>{selectedAnimal.description}</Text>
+                  <Text>Raça: {selectedAnimal.breed}</Text>
+                  <Text>Gênero: {selectedAnimal.gender}</Text>
+                  <Text>Idade: {selectedAnimal.age}</Text>
+                  <Text>Vacinação: {selectedAnimal.isVaccinated ? 'Sim' : 'Não'}</Text>
+                  <Text>Castração: {selectedAnimal.isCastrated ? 'Sim' : 'Não'}</Text>
+                  <Text>Status de adoção: {selectedAnimal.adoptionStatus}</Text>
+                  <Text>Porte: {selectedAnimal.size}</Text>
 
-                <TouchableOpacity style={styles.editButton} onPress={handleEditAnimal}>
-                  <Text style={styles.editButtonText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteAnimal(selectedAnimal.id)}>
-                  <Text style={styles.deleteButtonText}>Deletar</Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {selectedAnimal && editMode && (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nome do Animal"
-                  value={updatedAnimal.name}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, name: text })}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Tipo do Animal"
-                  value={updatedAnimal.type}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, type: text })}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Raça"
-                  value={updatedAnimal.breed}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, breed: text })}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Gênero"
-                  value={updatedAnimal.gender}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, gender: text })}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Idade"
-                  value={updatedAnimal.age}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, age: text })}
-                  keyboardType="numeric"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Descrição"
-                  value={updatedAnimal.description}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, description: text })}
-                />
-
-                <TouchableOpacity onPress={pickImage}>
-                  <Text style={styles.buttonText}>Selecionar Imagem</Text>
-                </TouchableOpacity>
-                {image && <Image source={{ uri: image }} style={styles.image} />}
-
-                <View style={styles.checkboxContainer}>
-                  <Text>Vacinação:</Text>
-                  <TouchableOpacity onPress={() => setUpdatedAnimal({ ...updatedAnimal, isVaccinated: !updatedAnimal.isVaccinated })}>
-                    <Text style={updatedAnimal.isVaccinated ? styles.checked : styles.unchecked}>
-                      {updatedAnimal.isVaccinated ? 'Sim' : 'Não'}
-                    </Text>
+                  <TouchableOpacity style={styles.editButton} onPress={handleEditAnimal}>
+                    <Text style={styles.editButtonText}>Editar</Text>
                   </TouchableOpacity>
-                </View>
-
-                <View style={styles.checkboxContainer}>
-                  <Text>Castração:</Text>
-                  <TouchableOpacity onPress={() => setUpdatedAnimal({ ...updatedAnimal, isCastrated: !updatedAnimal.isCastrated })}>
-                    <Text style={updatedAnimal.isCastrated ? styles.checked : styles.unchecked}>
-                      {updatedAnimal.isCastrated ? 'Sim' : 'Não'}
-                    </Text>
+                  <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteAnimal(selectedAnimal.id)}>
+                    <Text style={styles.deleteButtonText}>Deletar</Text>
                   </TouchableOpacity>
-                </View>
+                </>
+              )}
 
-                <TextInput
-                  style={styles.input}
-                  placeholder="Status de Adoção"
-                  value={updatedAnimal.adoptionStatus}
-                  onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, adoptionStatus: text })}
-                />
+              {selectedAnimal && editMode && (
+                <>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nome do Animal"
+                    value={updatedAnimal.name}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, name: text })}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Tipo do Animal"
+                    value={updatedAnimal.type}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, type: text })}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Raça"
+                    value={updatedAnimal.breed}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, breed: text })}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Gênero"
+                    value={updatedAnimal.gender}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, gender: text })}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Idade"
+                    value={updatedAnimal.age}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, age: text })}
+                    keyboardType="numeric"
+                  />
+                  <Text style={styles.label}>Porte</Text>
+                  <Picker
+                    selectedValue={updatedAnimal.size || selectedAnimal.size}
+                    onValueChange={(itemValue) => setUpdatedAnimal({ ...updatedAnimal, size: itemValue })}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Pequeno" value="pequeno" />
+                    <Picker.Item label="Médio" value="médio" />
+                    <Picker.Item label="Grande" value="grande" />
+                  </Picker>
 
-                <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
-                  <Text style={styles.saveButtonText}>Salvar</Text>
-                </TouchableOpacity>
-              </>
-            )}
+                  <TextInput
+                    style={[styles.input, { height: 100 }]}
+                    placeholder="Descrição"
+                    value={updatedAnimal.description}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, description: text })}
+                    multiline={true}
+                    numberOfLines={4}
+                  />
 
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeButtonText}>Fechar</Text>
-            </TouchableOpacity>
+                  <TouchableOpacity onPress={pickImage}>
+                    <Text style={styles.buttonText}>Selecionar Imagem</Text>
+                  </TouchableOpacity>
+                  {image && <Image source={{ uri: image }} style={styles.image} />}
+
+                  <View style={styles.checkboxContainer}>
+                    <Text>Vacinação:</Text>
+                    <TouchableOpacity onPress={() => setUpdatedAnimal({ ...updatedAnimal, isVaccinated: !updatedAnimal.isVaccinated })}>
+                      <Text style={updatedAnimal.isVaccinated ? styles.checked : styles.unchecked}>
+                        {updatedAnimal.isVaccinated ? 'Sim' : 'Não'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.checkboxContainer}>
+                    <Text>Castração:</Text>
+                    <TouchableOpacity onPress={() => setUpdatedAnimal({ ...updatedAnimal, isCastrated: !updatedAnimal.isCastrated })}>
+                      <Text style={updatedAnimal.isCastrated ? styles.checked : styles.unchecked}>
+                        {updatedAnimal.isCastrated ? 'Sim' : 'Não'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Status de Adoção"
+                    value={updatedAnimal.adoptionStatus}
+                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, adoptionStatus: text })}
+                  />
+
+                  <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
+                    <Text style={styles.saveButtonText}>Salvar</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </ScrollView>
+            <Button title="Fechar" onPress={() => setModalVisible(false)} />
           </View>
         </View>
       </Modal>
@@ -236,17 +254,15 @@ export default function AnimalListScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#f9f9f9',
-    paddingTop: 20,  // Adicionado para mover a lista um pouco mais para baixo
+    paddingTop: 20,
   },
   listContainer: {
     paddingHorizontal: 16,
-    marginTop: 20, // Aumentando o espaçamento para que os itens da lista fiquem mais abaixo
+    paddingBottom: 20,
   },
   animalContainer: {
     flexDirection: 'row',
@@ -264,15 +280,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 12,
+    marginRight: 10,
+  },
+  animalInfo: {
+    flex: 1,
   },
   animalName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   animalType: {
-    fontSize: 16,
-    color: '#777',
+    fontSize: 14,
+    color: '#666',
+  },
+  animalSize: {
+    fontSize: 14,
+    color: '#666',
   },
   modalContainer: {
     flex: 1,
@@ -281,15 +304,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: '85%', // Diminuímos o tamanho do modal para 85% da largura da tela
-    height: '85%', // Diminuímos o tamanho do modal para 85% da altura da tela
+    width: '90%',
+    maxHeight: '90%',
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 20,
+    padding: 15,
     shadowColor: '#000',
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  scrollViewContent: {
+    paddingBottom: 20,
   },
   expandedImage: {
     width: '100%',
@@ -318,74 +344,82 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
-    marginBottom: 12,
+    marginBottom: 8,
     paddingHorizontal: 8,
     borderRadius: 4,
   },
-  checkboxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
+  picker: {
+    height: 50,
+    width: '100%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    borderRadius: 4,
   },
-  checked: {
-    color: 'green',
-    fontWeight: 'bold',
-  },
-  unchecked: {
-    color: 'red',
-    fontWeight: 'bold',
+  label: {
+    fontSize: 14,
+    marginBottom: 5,
   },
   buttonText: {
     color: '#007bff',
-    marginBottom: 12,
+    fontSize: 16,
+    marginTop: 10,
   },
   image: {
     width: 100,
     height: 100,
-    marginVertical: 10,
+    marginTop: 10,
+    marginBottom: 20,
     borderRadius: 8,
   },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    justifyContent: 'space-between',
+  },
+  checked: {
+    marginLeft: 10,
+    color: 'green',
+    fontWeight: 'bold',
+  },
+  unchecked: {
+    marginLeft: 10,
+    color: 'red',
+    fontWeight: 'bold',
+  },
   saveButton: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
     borderRadius: 5,
+    alignItems: 'center',
     marginTop: 20,
   },
   saveButtonText: {
     color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   editButton: {
     backgroundColor: '#007bff',
-    padding: 10,
+    paddingVertical: 10,
     borderRadius: 5,
+    alignItems: 'center',
     marginBottom: 10,
   },
   editButtonText: {
     color: '#fff',
-    textAlign: 'center',
     fontWeight: 'bold',
   },
   deleteButton: {
     backgroundColor: '#ff4444',
-    padding: 10,
+    paddingVertical: 10,
     borderRadius: 5,
+    alignItems: 'center',
   },
   deleteButtonText: {
     color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  closeButton: {
-    backgroundColor: '#888',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  closeButtonText: {
-    color: '#fff',
-    textAlign: 'center',
     fontWeight: 'bold',
   },
 });

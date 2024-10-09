@@ -2,9 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import CreateAnimalScreen from './(tabs)/create-animais';
-import HomeScreen from './(tabs)/inicial';
 import LoginScreen from './(tabs)/index';
-import LibraryScreen from './(tabs)/biblioteca';
 import DonationsScreen from './(tabs)/doacoes';
 import EventsScreen from './(tabs)/eventos';
 import AdicionarEvento from './(tabs)/AdicionarEvento';
@@ -28,11 +26,6 @@ function Navigation() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: 'Página Inicial' }}
-        />
-        <Stack.Screen
           name="CreateAnimal"
           component={CreateAnimalScreen}
           options={{ title: 'Cadastro de Animais' }}
@@ -41,11 +34,6 @@ function Navigation() {
           name="Index"
           component={LoginScreen}
           options={{ title: 'Login' }}
-        />
-        <Stack.Screen
-          name="Library"
-          component={LibraryScreen}
-          options={{ title: 'View do Animal' }}
         />
         <Stack.Screen
           name="Donations"

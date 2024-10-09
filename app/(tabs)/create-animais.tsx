@@ -22,6 +22,7 @@ export default function AnimalRegistrationScreen() {
   const [description, setDescription] = useState<string>('');
   const [adoptionStatus, setAdoptionStatus] = useState<string>('Disponível'); // Status de adoção
   const [image, setImage] = useState<string | null>(null); // Foto do animal
+  const [size, setSize] = useState<string>('Pequeno'); // Novo estado para o porte do animal
 
   // Função para selecionar a imagem do animal
   const pickImage = async () => {
@@ -44,7 +45,7 @@ export default function AnimalRegistrationScreen() {
         Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
         return;
       }
-  
+
       let imageUrl = '';
       if (image) {
         const imageRef = ref(storage, `animals/${animalName}_${Date.now()}.jpg`);
@@ -53,7 +54,7 @@ export default function AnimalRegistrationScreen() {
         await uploadBytes(imageRef, bytes);
         imageUrl = await getDownloadURL(imageRef);
       }
-  
+
       const animalData = {
         name: animalName,
         type: animalType,
@@ -65,8 +66,9 @@ export default function AnimalRegistrationScreen() {
         description: description,
         adoptionStatus: adoptionStatus,
         image: imageUrl,
+        size: size,
       };
-  
+
       await addDoc(collection(db, 'animals'), animalData);
       Alert.alert('Sucesso', 'Animal cadastrado com sucesso!');
       navigation.navigate('Home');
@@ -117,6 +119,19 @@ export default function AnimalRegistrationScreen() {
         value={description}
         onChangeText={setDescription}
       />
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Porte do Animal:</Text>
+        <TouchableOpacity onPress={() => setSize('Pequeno')}>
+          <Text style={size === 'Pequeno' ? styles.checked : styles.unchecked}>Pequeno</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setSize('Médio')}>
+          <Text style={size === 'Médio' ? styles.checked : styles.unchecked}>Médio</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setSize('Grande')}>
+          <Text style={size === 'Grande' ? styles.checked : styles.unchecked}>Grande</Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity onPress={pickImage}>
         <Text style={styles.buttonText}>Selecionar Imagem</Text>
@@ -193,5 +208,12 @@ const styles = StyleSheet.create({
   unchecked: {
     color: 'red',
     fontWeight: 'bold',
+  },
+  inputContainer: {
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 4,
   },
 });
