@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, Button, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,32 +19,39 @@ const Eventos = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Events'>>();
 
-  useEffect(() => {
-    const carregarEventos = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'eventos'));
-        if (querySnapshot.empty) {
-          Alert.alert("Aviso", "Nenhum evento encontrado.");
-          setLoading(false);
-          return;
-        }
-
-        const eventosList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Evento[];
-
-        setEventos(eventosList);
+  const carregarEventos = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'eventos'));
+      if (querySnapshot.empty) {
+        Alert.alert("Aviso", "Nenhum evento encontrado.");
         setLoading(false);
-      } catch (error) {
-        Alert.alert("Erro", "Erro ao carregar eventos. Verifique a conexão.");
-        console.error("Erro ao carregar eventos: ", error);
-        setLoading(false);
+        return;
       }
-    };
 
-    carregarEventos();
+      const eventosList = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Evento[];
+
+      setEventos(eventosList);
+      setLoading(false);
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao carregar eventos. Verifique a conexão.");
+      console.error("Erro ao carregar eventos: ", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarEventos(); // Carregar eventos na primeira renderização
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarEventos(); // Carregar eventos sempre que a tela ganhar foco
+    }, [])
+  );
 
   const excluirEvento = async (id: string) => {
     try {
