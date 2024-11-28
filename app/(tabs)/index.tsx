@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config/firebaseConfig'; // Atualize conforme necessário
+import { auth } from '../../config/firebaseConfig';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
 
-// Defina o tipo para a navegação
 type RootStackParamList = {
-  inicial: undefined;
+  Home: undefined;
   cad: undefined;
 };
 
@@ -31,7 +30,7 @@ export default function LoginScreen() {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Usuário logado com sucesso:', userCredential.user);
-        navigation.navigate('inicial');
+        navigation.navigate('Home');
       })
       .catch((error) => {
         console.error('Erro ao fazer login:', error);
@@ -41,16 +40,11 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
-
-      {/* Título */}
       <Text style={styles.title}>Login</Text>
       <TouchableOpacity onPress={() => navigation.navigate('cad')}>
         <Text style={styles.subtitle}>ou crie sua conta</Text>
       </TouchableOpacity>
-
-      {/* Campo de Email */}
       <TextInput
         style={styles.input}
         placeholder="Nome de usuário ou email"
@@ -59,8 +53,6 @@ export default function LoginScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
-      {/* Campo de Senha */}
       <TextInput
         style={styles.input}
         placeholder="Senha"
@@ -68,21 +60,13 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
-
-      {/* Esqueci a Senha */}
       <TouchableOpacity>
         <Text style={styles.forgotPassword}>Esqueceu a Senha?</Text>
       </TouchableOpacity>
-
-      {/* Botão de Login */}
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
-
-      {/* Divider */}
       <Text style={styles.orText}>Ou entre com uma conta</Text>
-
-      {/* Login com Google e Facebook */}
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
           <FontAwesome name="google" size={32} color="#DB4437" />
@@ -168,4 +152,3 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
 });
-
