@@ -78,9 +78,9 @@ const Eventos = () => {
               {item.imageUrl ? (
                 <Image source={{ uri: item.imageUrl }} style={styles.imageBox} />
               ) : (
-                <Image 
-                  source={{ uri: 'https://via.placeholder.com/150.png?text=Sem+Imagem' }} 
-                  style={styles.imageBox} 
+                <Image
+                  source={{ uri: 'https://via.placeholder.com/150.png?text=Sem+Imagem' }}
+                  style={styles.imageBox}
                 />
               )}
 

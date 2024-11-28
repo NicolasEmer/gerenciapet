@@ -1,25 +1,24 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
+import Home from './(tabs)/Home';
 import CreateAnimalScreen from './(tabs)/create-animais';
 import LoginScreen from './(tabs)/index';
 import DonationsScreen from './(tabs)/doacoes';
 import EventsScreen from './(tabs)/eventos';
 import AdicionarEvento from './(tabs)/AdicionarEvento';
 import EditarEvento from './(tabs)/EditarEvento';
+import SignupScreen from './(tabs)/cad';
 
 export type RootStackParamList = {
   Home: undefined;
   CreateAnimal: undefined;
   Index: undefined;
-  Library: undefined;
   Donations: undefined;
   Events: undefined;
   AdicionarEvento: undefined;
   EditarEvento: { id: string };
-  EditarProduto: { id: string };
-  ListagemProdutos: undefined;
-  CadastroProduto: undefined;
+  cad: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -27,16 +26,21 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="CreateAnimal"
-          component={CreateAnimalScreen}
-          options={{ title: 'Cadastro de Animais' }}
-        />
+      <Stack.Navigator initialRouteName="Index">
         <Stack.Screen
           name="Index"
           component={LoginScreen}
           options={{ title: 'Login' }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ title: 'Gerencia Pet' }}
+        />
+        <Stack.Screen
+          name="CreateAnimal"
+          component={CreateAnimalScreen}
+          options={{ title: 'Cadastro de Animais' }}
         />
         <Stack.Screen
           name="Donations"
@@ -57,6 +61,11 @@ function Navigation() {
           name="EditarEvento"
           component={EditarEvento}
           options={{ title: 'Editar Evento' }}
+        />
+        <Stack.Screen
+          name="cad"
+          component={SignupScreen}
+          options={{ title: 'Cadastro' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
