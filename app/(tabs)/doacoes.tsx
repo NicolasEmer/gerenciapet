@@ -124,10 +124,12 @@ const Doacoes: React.FC = () => {
         )}
         ListFooterComponent={
           <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-            <Text style={styles.addButtonText}>Adicionar Método de Pagamento</Text>
+            <Text style={styles.addButtonText}>Adicionar Meio de Doação</Text>
           </TouchableOpacity>
         }
       />
+
+      
 
       {/* Modal para visualizar método de pagamento */}
       <Modal animationType="slide" transparent={true} visible={viewModalVisible} onRequestClose={() => setViewModalVisible(false)}>
@@ -151,7 +153,7 @@ const Doacoes: React.FC = () => {
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingMethod ? 'Editar Método de Pagamento' : 'Novo Método de Pagamento'}</Text>
+            <Text style={styles.modalTitle}>{editingMethod ? 'Editar Método de Doação' : 'Novo Método de Doação'}</Text>
 
             <TextInput
               style={styles.input}
@@ -344,3 +346,4 @@ const styles = StyleSheet.create({
 });
 
 export default Doacoes;
+
