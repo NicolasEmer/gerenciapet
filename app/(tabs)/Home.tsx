@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 
 const Home = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList,'home'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList,'Home'>>();
 
   return (
     <View style={styles.container}>

@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Acti
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebaseConfig';
 import { FontAwesome } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 
@@ -29,7 +29,7 @@ export default function LoginScreen() {
       .then((userCredential) => {
         console.log('Usuário logado com sucesso:', userCredential.user);
         setLoading(false);
-        navigation.navigate('home');
+        navigation.navigate('Home');
       })
       .catch((error) => {
         console.error('Erro ao fazer login:', error);

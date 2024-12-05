@@ -17,7 +17,7 @@ export type RootStackParamList = {
   createItem: undefined;
   listItem: undefined;
   listAnimais: undefined;
-  home: undefined;
+  Home: undefined;
   createAnimais: undefined;
   index: undefined;
   doacoes: undefined;
@@ -54,7 +54,7 @@ const Navigation = () => {
           options={{ title: 'Login' }}
         />
         <Stack.Screen
-          name="home"
+          name="Home"
           component={Home}
           options={{ title: 'Gerencia Pet' }}
         />
