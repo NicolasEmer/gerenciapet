@@ -4,6 +4,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../config/firebaseConfig';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation';
 
 const CadastroProduto = () => {
   const [nome, setNome] = useState('');
@@ -16,6 +19,7 @@ const CadastroProduto = () => {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [produtoId, setProdutoId] = useState<string | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'listItem'>>();
 
   useEffect(() => {
     listarProdutos();
@@ -122,6 +126,11 @@ const CadastroProduto = () => {
     }
   };
 
+  const handleRegisterItem = () => {
+    // Lógica para cadastrar animal (navegar para nova tela ou abrir modal).
+    navigation.navigate('createItem'); // Certifique-se de que essa tela está configurada.
+  };
+
   const limparFormulario = () => {
     setNome('');
     setCategoria('');
@@ -217,11 +226,34 @@ const CadastroProduto = () => {
           </ScrollView>
         </View>
       </Modal>
+      <TouchableOpacity style={styles.registerButton} onPress={handleRegisterItem}>
+        <Text style={styles.registerButtonText}>Cadastrar Item</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  registerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     padding: 20,

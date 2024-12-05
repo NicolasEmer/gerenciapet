@@ -83,7 +83,7 @@ const AdicionarEvento = () => {
 
       await addDoc(collection(db, 'eventos'), eventoData);
       Alert.alert('Sucesso', 'Evento cadastrado com sucesso!');
-      navigation.goBack();
+      navigation.navigate('eventos');
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao cadastrar o evento. Verifique as permissões de acesso ao Firebase.');
       console.error('Erro ao registrar evento:', error);

@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../config/firebaseConfig'; // Atualize conforme necessário
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-// Defina o tipo para a navegação
-type RootStackParamList = {
-  index: undefined;
-};
+import { RootStackParamList } from '../navigation';
 
 export default function SignupScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList,'cad'>>();
   
   // Estados para email, senha e confirmação de senha
   const [email, setEmail] = useState<string>('');

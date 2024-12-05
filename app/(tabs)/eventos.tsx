@@ -17,7 +17,7 @@ interface Evento {
 const Eventos = () => {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Events'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'eventos'>>();
 
   const carregarEventos = async () => {
     setLoading(true);

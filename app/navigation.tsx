@@ -2,53 +2,74 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Home from './(tabs)/Home';
-import CreateAnimalScreen from './(tabs)/create-animais';
+import CreateAnimalScreen from './(tabs)/createAnimais';
 import LoginScreen from './(tabs)/index';
 import DonationsScreen from './(tabs)/doacoes';
 import EventsScreen from './(tabs)/eventos';
 import AdicionarEvento from './(tabs)/AdicionarEvento';
 import EditarEvento from './(tabs)/EditarEvento';
 import SignupScreen from './(tabs)/cad';
+import AnimalListScreen from './(tabs)/listAnimais';
+import CadastroProduto from './(tabs)/listItem';
+import CadProduto from './(tabs)/createItem';
 
 export type RootStackParamList = {
-  Home: undefined;
-  CreateAnimal: undefined;
-  Index: undefined;
-  Donations: undefined;
-  Events: undefined;
+  createItem: undefined;
+  listItem: undefined;
+  listAnimais: undefined;
+  home: undefined;
+  createAnimais: undefined;
+  index: undefined;
+  doacoes: undefined;
+  eventos: undefined;
   AdicionarEvento: undefined;
-  EditarEvento: { id: string };
+  EditarEvento: { id: string }; // Aceita parâmetro `id`
   cad: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function Navigation() {
+const Navigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Index">
+      <Stack.Navigator initialRouteName="index">
         <Stack.Screen
-          name="Index"
+          name="createItem"
+          component={CadProduto}
+          options={{ title: 'Cadastrar Animais' }}
+        />
+        <Stack.Screen
+          name="listItem"
+          component={CadastroProduto}
+          options={{ title: 'Listar Animais' }}
+        />
+        <Stack.Screen
+          name="listAnimais"
+          component={AnimalListScreen}
+          options={{ title: 'Listar Animais' }}
+        />
+        <Stack.Screen
+          name="index"
           component={LoginScreen}
           options={{ title: 'Login' }}
         />
         <Stack.Screen
-          name="Home"
+          name="home"
           component={Home}
           options={{ title: 'Gerencia Pet' }}
         />
         <Stack.Screen
-          name="CreateAnimal"
+          name="createAnimais"
           component={CreateAnimalScreen}
           options={{ title: 'Cadastro de Animais' }}
         />
         <Stack.Screen
-          name="Donations"
+          name="doacoes"
           component={DonationsScreen}
           options={{ title: 'Doações' }}
         />
         <Stack.Screen
-          name="Events"
+          name="eventos"
           component={EventsScreen}
           options={{ title: 'Eventos' }}
         />
@@ -60,7 +81,10 @@ function Navigation() {
         <Stack.Screen
           name="EditarEvento"
           component={EditarEvento}
-          options={{ title: 'Editar Evento' }}
+          options={{
+            title: 'Editar Evento',
+            presentation: 'modal', // Opção para abrir como modal
+          }}
         />
         <Stack.Screen
           name="cad"
@@ -70,6 +94,6 @@ function Navigation() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 export default Navigation;

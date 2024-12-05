@@ -5,32 +5,53 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 
 const Home = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList,'home'>>();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Menu Principal</Text>
+      <Text style={styles.title}>Bem-Vindo ao GerenciaPet</Text>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('CreateAnimal')}
+        onPress={() => navigation.navigate('listAnimais')}
       >
-        <Text style={styles.buttonText}>Gerenciar Animais</Text>
+        <Text style={styles.buttonText}>Biblioteca de Animais</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Events')}
+        onPress={() => navigation.navigate('eventos')}
       >
-        <Text style={styles.buttonText}>Gerenciar Eventos</Text>
+        <Text style={styles.buttonText}>Ver Eventos</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Donations')}
+        onPress={() => navigation.navigate('listItem')}
       >
-        <Text style={styles.buttonText}>Doações</Text>
+        <Text style={styles.buttonText}>Nosso Estoque</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigation.navigate('doacoes');
+        }}
+        
+      >
+        <Text style={styles.buttonText}>Nos Ajude a Salvar Vidas!</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.buttoni}
+        onPress={() => {
+          navigation.navigate('doacoes');
+        }}
+        
+      >
+        <Text style={styles.buttonText}>Informar Animal Perdido</Text>
+      </TouchableOpacity>
+
     </View>
   );
 };
@@ -59,6 +80,14 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  buttoni: {
+    width: '80%',
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: '#eb3434',
+    borderRadius: 10,
+    alignItems: 'center',
   },
 });
 

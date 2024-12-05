@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react'; 
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebaseConfig';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
-
-type RootStackParamList = {
-  Home: undefined;
-  cad: undefined;
-};
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList,'index'>>();
 
   const handleLogin = () => {
     if (!email.includes('@')) {
@@ -27,13 +24,16 @@ export default function LoginScreen() {
       return;
     }
 
+    setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Usuário logado com sucesso:', userCredential.user);
-        navigation.navigate('Home');
+        setLoading(false);
+        navigation.navigate('home');
       })
       .catch((error) => {
         console.error('Erro ao fazer login:', error);
+        setLoading(false);
         Alert.alert('Erro', error.message);
       });
   };
@@ -63,9 +63,13 @@ export default function LoginScreen() {
       <TouchableOpacity>
         <Text style={styles.forgotPassword}>Esqueceu a Senha?</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007BFF" />
+      ) : (
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+      )}
       <Text style={styles.orText}>Ou entre com uma conta</Text>
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>

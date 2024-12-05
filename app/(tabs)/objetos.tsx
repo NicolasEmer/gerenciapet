@@ -5,62 +5,62 @@ import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../config/firebaseConfig'; // Importa a configuração Firebase
 
-const doacoes: React.FC = () => {
+const Objetos: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [viewModalVisible, setViewModalVisible] = useState(false);
-  const [paymentMethodName, setPaymentMethodName] = useState('');
-  const [paymentMethodDescription, setPaymentMethodDescription] = useState('');
+  const [objectName, setObjectName] = useState('');
+  const [objectDescription, setObjectDescription] = useState('');
   const [image, setImage] = useState<string | null>(null);
-  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
-  const [editingMethod, setEditingMethod] = useState<any>(null);
-  const [viewingMethod, setViewingMethod] = useState<any>(null);
+  const [objects, setObjects] = useState<any[]>([]);
+  const [editingObject, setEditingObject] = useState<any>(null);
+  const [viewingObject, setViewingObject] = useState<any>(null);
 
   useEffect(() => {
-    fetchPaymentMethods();
+    fetchObjects();
   }, []);
 
-  const fetchPaymentMethods = async () => {
-    const querySnapshot = await getDocs(collection(db, 'paymentMethods'));
-    const methods = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    setPaymentMethods(methods);
+  const fetchObjects = async () => {
+    const querySnapshot = await getDocs(collection(db, 'objects'));
+    const fetchedObjects = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    setObjects(fetchedObjects);
   };
 
-  const handleAddOrUpdatePaymentMethod = async () => {
-    if (!paymentMethodName || !paymentMethodDescription) {
+  const handleAddOrUpdateObject = async () => {
+    if (!objectName || !objectDescription) {
       Alert.alert('Erro', 'Preencha todos os campos.');
       return;
     }
 
     let imageUrl = '';
     if (image) {
-      const imageRef = ref(storage, `images/${paymentMethodName}_${Date.now()}.jpg`);
+      const imageRef = ref(storage, `images/${objectName}_${Date.now()}.jpg`);
       const img = await fetch(image);
       const bytes = await img.blob();
       await uploadBytes(imageRef, bytes);
       imageUrl = await getDownloadURL(imageRef);
     }
 
-    const methodData = {
-      name: paymentMethodName,
-      description: paymentMethodDescription,
+    const objectData = {
+      name: objectName,
+      description: objectDescription,
       image: imageUrl,
     };
 
-    if (editingMethod) {
-      const methodRef = doc(db, 'paymentMethods', editingMethod.id);
-      await updateDoc(methodRef, methodData);
-      Alert.alert('Sucesso', 'Método atualizado com sucesso!');
+    if (editingObject) {
+      const objectRef = doc(db, 'objects', editingObject.id);
+      await updateDoc(objectRef, objectData);
+      Alert.alert('Sucesso', 'Objeto atualizado com sucesso!');
     } else {
-      await addDoc(collection(db, 'paymentMethods'), methodData);
-      Alert.alert('Sucesso', 'Método adicionado com sucesso!');
+      await addDoc(collection(db, 'objects'), objectData);
+      Alert.alert('Sucesso', 'Objeto adicionado com sucesso!');
     }
 
     setModalVisible(false);
-    setPaymentMethodName('');
-    setPaymentMethodDescription('');
+    setObjectName('');
+    setObjectDescription('');
     setImage(null);
-    setEditingMethod(null);
-    fetchPaymentMethods(); 
+    setEditingObject(null);
+    fetchObjects(); 
   };
 
   const pickImage = async () => {
@@ -76,22 +76,22 @@ const doacoes: React.FC = () => {
     }
   };
 
-  const handleEditMethod = (method: any) => {
-    setEditingMethod(method);
-    setPaymentMethodName(method.name);
-    setPaymentMethodDescription(method.description);
-    setImage(method.image);
+  const handleEditObject = (object: any) => {
+    setEditingObject(object);
+    setObjectName(object.name);
+    setObjectDescription(object.description);
+    setImage(object.image);
     setModalVisible(true);
   };
 
-  const handleDeleteMethod = async (id: string) => {
-    await deleteDoc(doc(db, 'paymentMethods', id));
-    Alert.alert('Sucesso', 'Método deletado com sucesso!');
-    fetchPaymentMethods(); 
+  const handleDeleteObject = async (id: string) => {
+    await deleteDoc(doc(db, 'objects', id));
+    Alert.alert('Sucesso', 'Objeto deletado com sucesso!');
+    fetchObjects(); 
   };
 
-  const handleViewMethod = (method: any) => {
-    setViewingMethod(method);
+  const handleViewObject = (object: any) => {
+    setViewingObject(object);
     setViewModalVisible(true);
   };
 
@@ -100,23 +100,23 @@ const doacoes: React.FC = () => {
       {/* Adicionando imagem no topo */}
       <Image source={require('../../assets/images/doacoes.png')} style={styles.topImage} />
 
-      {/* Lista rolável de métodos de pagamento */}
+      {/* Lista rolável de objetos */}
       <FlatList
-        data={paymentMethods}
+        data={objects}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.methodContainer}>
-            <TouchableOpacity onPress={() => handleViewMethod(item)}>
+            <TouchableOpacity onPress={() => handleViewObject(item)}>
               <Image source={{ uri: item.image }} style={styles.qrImage} />
             </TouchableOpacity>
             <Text style={styles.methodName}>{item.name}</Text>
             <Text style={styles.methodDescription}>{item.description}</Text>
 
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity onPress={() => handleEditMethod(item)} style={styles.editButton}>
+              <TouchableOpacity onPress={() => handleEditObject(item)} style={styles.editButton}>
                 <Text style={styles.editButtonText}>Editar</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteMethod(item.id)} style={styles.deleteButton}>
+              <TouchableOpacity onPress={() => handleDeleteObject(item.id)} style={styles.deleteButton}>
                 <Text style={styles.deleteButtonText}>Deletar</Text>
               </TouchableOpacity>
             </View>
@@ -124,22 +124,20 @@ const doacoes: React.FC = () => {
         )}
         ListFooterComponent={
           <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-            <Text style={styles.addButtonText}>Adicionar Meio de Doação</Text>
+            <Text style={styles.addButtonText}>Adicionar Objeto</Text>
           </TouchableOpacity>
         }
       />
 
-      
-
-      {/* Modal para visualizar método de pagamento */}
+      {/* Modal para visualizar objeto */}
       <Modal animationType="slide" transparent={true} visible={viewModalVisible} onRequestClose={() => setViewModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {viewingMethod && (
+            {viewingObject && (
               <>
-                <Image source={{ uri: viewingMethod.image }} style={styles.expandedImage} />
-                <Text style={styles.modalTitle}>{viewingMethod.name}</Text>
-                <Text style={styles.methodDescription}>{viewingMethod.description}</Text>
+                <Image source={{ uri: viewingObject.image }} style={styles.expandedImage} />
+                <Text style={styles.modalTitle}>{viewingObject.name}</Text>
+                <Text style={styles.methodDescription}>{viewingObject.description}</Text>
               </>
             )}
             <TouchableOpacity style={styles.closeButton} onPress={() => setViewModalVisible(false)}>
@@ -149,31 +147,31 @@ const doacoes: React.FC = () => {
         </View>
       </Modal>
 
-      {/* Modal para adicionar ou editar método de pagamento */}
+      {/* Modal para adicionar ou editar objeto */}
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingMethod ? 'Editar Método de Doação' : 'Novo Método de Doação'}</Text>
+            <Text style={styles.modalTitle}>{editingObject ? 'Editar Objeto' : 'Novo Objeto'}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Nome do Método"
-              value={paymentMethodName}
-              onChangeText={setPaymentMethodName}
+              placeholder="Nome do Objeto"
+              value={objectName}
+              onChangeText={setObjectName}
             />
 
             <TextInput
               style={styles.input}
-              placeholder="Descrição do Método"
-              value={paymentMethodDescription}
-              onChangeText={setPaymentMethodDescription}
+              placeholder="Descrição do Objeto"
+              value={objectDescription}
+              onChangeText={setObjectDescription}
             />
 
             <Button title="Selecionar Imagem" onPress={pickImage} />
             {image && <Image source={{ uri: image }} style={styles.selectedImage} />}
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.saveButton} onPress={handleAddOrUpdatePaymentMethod}>
+              <TouchableOpacity style={styles.saveButton} onPress={handleAddOrUpdateObject}>
                 <Text style={styles.saveButtonText}>Salvar</Text>
               </TouchableOpacity>
 
@@ -345,5 +343,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default doacoes;
-
+export default Objetos;

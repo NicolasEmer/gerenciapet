@@ -5,6 +5,9 @@ import { db, storage } from '../../config/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 interface Animal {
   id: string;
@@ -29,6 +32,7 @@ export default function AnimalListScreen() {
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [updatedAnimal, setUpdatedAnimal] = useState<Partial<Animal>>({});
   const [image, setImage] = useState<string | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'listAnimais'>>();
 
   useEffect(() => {
     fetchAnimals();
@@ -104,6 +108,11 @@ export default function AnimalListScreen() {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const handleRegisterAnimal = () => {
+    // Lógica para cadastrar animal (navegar para nova tela ou abrir modal).
+    navigation.navigate('createAnimais'); // Certifique-se de que essa tela está configurada.
   };
 
   const renderItem = ({ item }: { item: Animal }) => (
@@ -246,15 +255,38 @@ export default function AnimalListScreen() {
                 </>
               )}
             </ScrollView>
-            <Button title="Fechar" onPress={() => setModalVisible(false)} />
+            <Button title="Fechar" onPress={() => setModalVisible(false)} /> 
           </View>
         </View>
       </Modal>
+      <TouchableOpacity style={styles.registerButton} onPress={handleRegisterAnimal}>
+        <Text style={styles.registerButtonText}>Cadastrar Animal</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
+  registerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',

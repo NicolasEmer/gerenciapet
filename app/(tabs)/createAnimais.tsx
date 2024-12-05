@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 
 export default function AnimalRegistrationScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateAnimal'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'createAnimais'>>();
 
   // Estados para capturar dados do formulário
   const [animalName, setAnimalName] = useState<string>('');
@@ -71,7 +71,7 @@ export default function AnimalRegistrationScreen() {
 
       await addDoc(collection(db, 'animals'), animalData);
       Alert.alert('Sucesso', 'Animal cadastrado com sucesso!');
-      navigation.navigate('Home');
+      navigation.navigate('listAnimais');
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao cadastrar o animal. Verifique as permissões de acesso ao Firebase.');
       console.error('Erro ao registrar animal:', error);

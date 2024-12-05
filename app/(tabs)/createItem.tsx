@@ -4,8 +4,11 @@ import * as ImagePicker from 'expo-image-picker';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../config/firebaseConfig';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-const CadastroProduto = () => {
+const CadProduto = () => {
   const [nome, setNome] = useState('');
   const [categoria, setCategoria] = useState('');
   const [quantidade, setQuantidade] = useState('');
@@ -13,6 +16,7 @@ const CadastroProduto = () => {
   const [descricao, setDescricao] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'createItem'>>();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -65,6 +69,7 @@ const CadastroProduto = () => {
       setDataValidade('');
       setDescricao('');
       setImage(null);
+      navigation.navigate('listItem');
     } catch (error) {
       Alert.alert('Erro', 'Erro ao cadastrar produto. Verifique a conexão.');
       console.error('Erro ao cadastrar produto:', error);
@@ -175,4 +180,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CadastroProduto;
+export default CadProduto;

@@ -120,7 +120,7 @@ const EditarEvento = () => {
       });
 
       Alert.alert('Sucesso', 'Evento atualizado com sucesso!');
-      navigation.goBack();
+      navigation.navigate('eventos');
     } catch (error) {
       Alert.alert('Erro', 'Erro ao atualizar evento. Verifique as permissões de acesso ao Firebase.');
       console.error('Erro ao atualizar evento:', error);
