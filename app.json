@@ -12,6 +12,11 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "permissions": [
+      "CAMERA",
+      "CAMERA_ROLL",
+      "LOCATION"
+    ],
     "ios": {
       "supportsTablet": true
     },

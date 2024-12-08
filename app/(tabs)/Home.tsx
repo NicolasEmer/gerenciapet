@@ -9,49 +9,42 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-Vindo ao GerenciaPet</Text>
+      <Text style={styles.title}>Bem-vindo ao GerenciaPet</Text>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('listAnimais')}
       >
-        <Text style={styles.buttonText}>Biblioteca de Animais</Text>
+        <Text style={styles.buttonText}>Biblioteca de animais</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('eventos')}
       >
-        <Text style={styles.buttonText}>Ver Eventos</Text>
+        <Text style={styles.buttonText}>Ver eventos</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('listItem')}
       >
-        <Text style={styles.buttonText}>Nosso Estoque</Text>
+        <Text style={styles.buttonText}>Nosso estoque</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          navigation.navigate('doacoes');
-        }}
-        
+        onPress={() => navigation.navigate('doacoes')}
       >
-        <Text style={styles.buttonText}>Nos Ajude a Salvar Vidas!</Text>
+        <Text style={styles.buttonText}>Nos ajude a salvar vidas!</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.buttoni}
-        onPress={() => {
-          navigation.navigate('doacoes');
-        }}
-        
+        onPress={() => navigation.navigate('listagem')}
       >
-        <Text style={styles.buttonText}>Informar Animal Perdido</Text>
+        <Text style={styles.buttonText}>Lista de animais perdidos</Text>
       </TouchableOpacity>
-
     </View>
   );
 };

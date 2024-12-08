@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 
-const CadastroProduto = () => {
+const ListarProduto = () => {
   const [nome, setNome] = useState('');
   const [categoria, setCategoria] = useState('');
   const [quantidade, setQuantidade] = useState('');
@@ -127,7 +127,6 @@ const CadastroProduto = () => {
   };
 
   const handleRegisterItem = () => {
-    // Lógica para cadastrar animal (navegar para nova tela ou abrir modal).
     navigation.navigate('createItem'); // Certifique-se de que essa tela está configurada.
   };
 
@@ -346,4 +345,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CadastroProduto;
+export default ListarProduto;
