@@ -7,6 +7,7 @@ import { db, storage } from '../../config/firebaseConfig';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 
 const CadProduto = () => {
   const [nome, setNome] = useState('');
@@ -17,6 +18,14 @@ const CadProduto = () => {
   const [image, setImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'createItem'>>();
+
+  const categorias = [
+    { label: 'Ração', value: 'Ração' },
+    { label: 'Medicamentos', value: 'Medicamentos' },
+    { label: 'Brinquedos', value: 'Brinquedos' },
+    { label: 'Produtos de Higiene', value: 'Produtos de Higiene' },
+    { label: 'Acessórios', value: 'Acessórios' },
+  ];
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -34,6 +43,18 @@ const CadProduto = () => {
   const cadastrarProduto = async () => {
     if (!nome || !categoria || !quantidade || !dataValidade) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const dataAtual = new Date();
+    const [dia, mes, ano] = dataValidade.split('/').map(Number);
+    const dataSelecionada = new Date(ano, mes - 1, dia);
+
+    if (
+      isNaN(dataSelecionada.getTime()) || // Verifica se é uma data inválida
+      dataSelecionada < dataAtual // Verifica se a data é anterior à atual
+    ) {
+      Alert.alert('Erro', 'Por favor, insira uma data válida no futuro.');
       return;
     }
 
@@ -90,13 +111,16 @@ const CadProduto = () => {
         onChangeText={setNome}
       />
 
-      <Text style={styles.label}>Categoria*</Text>
-      <TextInput
+      <Picker
+        selectedValue={categoria}
+        onValueChange={(itemValue) => setCategoria(itemValue)}
         style={styles.input}
-        placeholder="Ex: Alimentos, Medicamentos, Limpeza"
-        value={categoria}
-        onChangeText={setCategoria}
-      />
+      >
+        <Picker.Item label="Selecione uma categoria" value="" />
+        {categorias.map((cat, index) => (
+          <Picker.Item key={index} label={cat.label} value={cat.value} />
+        ))}
+      </Picker>
 
       <Text style={styles.label}>Quantidade*</Text>
       <TextInput
@@ -107,12 +131,22 @@ const CadProduto = () => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Data de Validade*</Text>
       <TextInput
         style={styles.input}
-        placeholder="Ex: 10/12/2024"
+        placeholder="DD/MM/AAAA"
         value={dataValidade}
-        onChangeText={setDataValidade}
+        keyboardType="numeric" // Garante que o teclado numérico seja utilizado
+        maxLength={10} // Limita a entrada a 10 caracteres (formato DD/MM/AAAA)
+        onChangeText={(text) => {
+          let formatted = text.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+          if (formatted.length > 2) {
+            formatted = `${formatted.slice(0, 2)}/${formatted.slice(2)}`;
+          }
+          if (formatted.length > 5) {
+            formatted = `${formatted.slice(0, 5)}/${formatted.slice(5)}`;
+          }
+          setDataValidade(formatted);
+        }}
       />
 
       <Text style={styles.label}>Descrição</Text>
@@ -151,8 +185,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 8,
   },
+  picker: {
+    backgroundColor: '#ffffff', // Fundo branco
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 8,
+    marginBottom: 15,
+  },
   input: {
-    height: 40,
+    height: 60,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,

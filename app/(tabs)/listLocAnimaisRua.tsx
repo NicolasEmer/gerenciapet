@@ -18,6 +18,7 @@ import MapView, { Marker, MapPressEvent } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
+import * as ImagePicker from 'expo-image-picker';
 
 interface Location {
   id: string;
@@ -57,7 +58,7 @@ const LocationListScreen = () => {
   useEffect(() => {
     fetchLocations();
   }, []);
-
+  
   const fetchLocations = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'reportedAnimals'));
@@ -81,6 +82,25 @@ const LocationListScreen = () => {
       console.error('Erro ao buscar localizações:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePickImage = async () => {
+    // Solicita permissão para acessar a galeria
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (!permissionResult.granted) {
+      alert('Permissão para acessar a galeria é necessária!');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+  
+    if (!result.canceled && result.assets) {
+      setEditImage(result.assets[0].uri);
     }
   };
 
@@ -139,20 +159,18 @@ const LocationListScreen = () => {
           <ScrollView contentContainerStyle={styles.modalContent}>
 
 
-            <Text style={styles.modalTitle}>Editar Detalhes</Text>
+            <Text style={styles.modalTitle}>Edição</Text>
 
-            <Text style={styles.modalText}>Imagem:</Text>
-              {editImage ? (
+            {editImage ? (
+              <>
                 <Image source={{ uri: editImage }} style={styles.modalImagePreview} />
-              ) : (
-                <Text style={styles.noImageText}>Nenhuma imagem disponível</Text>
-              )}
-              <TextInput
-                style={styles.input}
-                value={editImage}
-                onChangeText={setEditImage}
-                placeholder="Insira a URL da imagem"
-              />
+              </>
+            ) : (
+              <Text style={styles.noImageText}>Nenhuma imagem disponível</Text>
+            )}
+              <TouchableOpacity style={styles.openMapButton} onPress={handlePickImage}>
+                <Text style={styles.buttonText}>Selecionar Imagem</Text>
+              </TouchableOpacity>
 
             <Text style={styles.modalText}>Tipo:</Text>
             <TextInput
@@ -197,7 +215,7 @@ const LocationListScreen = () => {
                 setMapVisible(true);
               }}
             >
-              <Text style={styles.buttonText}>Atualizar Localização</Text>
+              <Text style={styles.buttonText}>Atualizar/Ver Localização</Text>
             </TouchableOpacity>
 
             <View style={styles.buttonRow}>
@@ -302,12 +320,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   modalImagePreview: {
-    width: '100%',
+    width: 300,
     height: 200,
     borderRadius: 8,
     marginBottom: 12,
     backgroundColor: '#e0e0e0',
-  },
+  },  
   noImageText: {
     textAlign: 'center',
     fontSize: 16,
@@ -359,6 +377,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    padding: 20,
   },
   modalContent: {
     width: '90%',

@@ -12,7 +12,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false, tabBarStyle: { display: 'none' },
+        headerShown: false, tabBarStyle: { display: 'flex' },
       }}>
       <Tabs.Screen
         name="index"

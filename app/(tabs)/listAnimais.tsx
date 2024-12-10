@@ -242,12 +242,16 @@ export default function AnimalListScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Status de Adoção"
-                    value={updatedAnimal.adoptionStatus}
-                    onChangeText={(text) => setUpdatedAnimal({ ...updatedAnimal, adoptionStatus: text })}
-                  />
+                  <Picker
+                    selectedValue={updatedAnimal.adoptionStatus}
+                    onValueChange={(itemValue) =>
+                      setUpdatedAnimal({ ...updatedAnimal, adoptionStatus: itemValue })
+                    }
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Disponível" value="Disponível" />
+                    <Picker.Item label="Indisponível" value="Indisponível" />
+                  </Picker>
 
                   <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
                     <Text style={styles.saveButtonText}>Salvar</Text>
@@ -381,7 +385,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   picker: {
-    height: 50,
+    height:55,
     width: '100%',
     borderColor: '#ccc',
     borderWidth: 1,

@@ -7,6 +7,7 @@ import { db, storage } from '../../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
+import { Picker } from '@react-native-picker/picker';
 
 const ListarProduto = () => {
   const [nome, setNome] = useState('');
@@ -20,6 +21,14 @@ const ListarProduto = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [produtoId, setProdutoId] = useState<string | null>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'listItem'>>();
+
+  const categorias = [
+    { label: 'Ração', value: 'Ração' },
+    { label: 'Medicamentos', value: 'Medicamentos' },
+    { label: 'Brinquedos', value: 'Brinquedos' },
+    { label: 'Produtos de Higiene', value: 'Produtos de Higiene' },
+    { label: 'Acessórios', value: 'Acessórios' },
+  ];
 
   useEffect(() => {
     listarProdutos();
@@ -179,12 +188,16 @@ const ListarProduto = () => {
             />
 
             <Text style={styles.label}>Categoria*</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Alimentos, Medicamentos, Limpeza"
-              value={categoria}
-              onChangeText={setCategoria}
-            />
+            <Picker
+            selectedValue={categoria}
+            onValueChange={(itemValue) => setCategoria(itemValue)}
+            style={styles.input}
+          >
+            <Picker.Item label="Selecione uma categoria" value="" />
+            {categorias.map((cat, index) => (
+              <Picker.Item key={index} label={cat.label} value={cat.value} />
+            ))}
+          </Picker>
 
             <Text style={styles.label}>Quantidade*</Text>
             <TextInput
@@ -265,7 +278,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   input: {
-    height: 40,
+    height: 60,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
@@ -280,6 +293,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     marginHorizontal: 5,
+  },
+  picker: {
+    backgroundColor: '#ffffff', // Fundo branco
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 8,
+    marginBottom: 15,
   },
   buttonText: {
     color: '#fff',
