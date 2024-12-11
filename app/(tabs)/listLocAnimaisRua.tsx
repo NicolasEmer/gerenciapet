@@ -47,7 +47,7 @@ const LocationListScreen = () => {
     longitudeDelta: 0.01,
   });
 
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'listagem'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'listLocAnimaisRua'>>();
 
   const [editType, setEditType] = useState('');
   const [editBreed, setEditBreed] = useState('');
@@ -124,6 +124,11 @@ const LocationListScreen = () => {
   const handleMapPress = (event: MapPressEvent) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setTempMapRegion({ ...tempMapRegion, latitude, longitude });
+  };
+
+  const handleRegistration = () => {
+    // Lógica para cadastrar animal (navegar para nova tela ou abrir modal).
+    navigation.navigate('createLocAnimaisRua'); // Certifique-se de que essa tela está configurada.
   };
 
   const renderItem = ({ item }: { item: Location }) => (
@@ -289,10 +294,33 @@ const LocationListScreen = () => {
           </View>
         </Modal>
       </Modal>
+      <TouchableOpacity style={styles.registerButton} onPress={handleRegistration}>
+        <Text style={styles.registerButtonText}>Informar Animal</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 const styles = StyleSheet.create({
+
+  registerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#f0f0f5',

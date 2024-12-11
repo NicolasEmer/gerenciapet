@@ -6,7 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../config/firebaseConfig';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 
 const CadProduto = () => {
@@ -36,7 +36,7 @@ const CadProduto = () => {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri); // Define a URI da nova imagem temporariamente
+      setImage(result.assets[0].uri);
     }
   };
 
@@ -51,8 +51,8 @@ const CadProduto = () => {
     const dataSelecionada = new Date(ano, mes - 1, dia);
 
     if (
-      isNaN(dataSelecionada.getTime()) || // Verifica se é uma data inválida
-      dataSelecionada < dataAtual // Verifica se a data é anterior à atual
+      isNaN(dataSelecionada.getTime()) ||
+      dataSelecionada < dataAtual
     ) {
       Alert.alert('Erro', 'Por favor, insira uma data válida no futuro.');
       return;
@@ -63,7 +63,6 @@ const CadProduto = () => {
     try {
       let imageUrl = '';
 
-      // Upload da imagem
       if (image) {
         const imageRef = ref(storage, `produtos/${nome}_${Date.now()}.jpg`);
         const img = await fetch(image);
@@ -72,7 +71,6 @@ const CadProduto = () => {
         imageUrl = await getDownloadURL(imageRef);
       }
 
-      // Cadastrar o produto no Firestore
       await addDoc(collection(db, 'produtos'), {
         nome,
         categoria,
@@ -83,7 +81,6 @@ const CadProduto = () => {
       });
 
       Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
-      // Limpar o formulário
       setNome('');
       setCategoria('');
       setQuantidade('');
@@ -100,79 +97,91 @@ const CadProduto = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Cadastro de Produto</Text>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Cadastro de Produto</Text>
 
-      <Text style={styles.label}>Nome do Produto*</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite o nome do produto"
-        value={nome}
-        onChangeText={setNome}
-      />
+        <Text style={styles.label}>Nome do Produto*</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite o nome do produto"
+          value={nome}
+          onChangeText={setNome}
+        />
 
-      <Picker
-        selectedValue={categoria}
-        onValueChange={(itemValue) => setCategoria(itemValue)}
-        style={styles.input}
-      >
-        <Picker.Item label="Selecione uma categoria" value="" />
-        {categorias.map((cat, index) => (
-          <Picker.Item key={index} label={cat.label} value={cat.value} />
-        ))}
-      </Picker>
+        <Picker
+          selectedValue={categoria}
+          onValueChange={(itemValue) => setCategoria(itemValue)}
+          style={styles.input}
+        >
+          <Picker.Item label="Selecione uma categoria" value="" />
+          {categorias.map((cat, index) => (
+            <Picker.Item key={index} label={cat.label} value={cat.value} />
+          ))}
+        </Picker>
 
-      <Text style={styles.label}>Quantidade*</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite a quantidade disponível"
-        value={quantidade}
-        onChangeText={setQuantidade}
-        keyboardType="numeric"
-      />
+        <Text style={styles.label}>Quantidade*</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite a quantidade disponível"
+          value={quantidade}
+          onChangeText={setQuantidade}
+          keyboardType="numeric"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="DD/MM/AAAA"
-        value={dataValidade}
-        keyboardType="numeric" // Garante que o teclado numérico seja utilizado
-        maxLength={10} // Limita a entrada a 10 caracteres (formato DD/MM/AAAA)
-        onChangeText={(text) => {
-          let formatted = text.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
-          if (formatted.length > 2) {
-            formatted = `${formatted.slice(0, 2)}/${formatted.slice(2)}`;
-          }
-          if (formatted.length > 5) {
-            formatted = `${formatted.slice(0, 5)}/${formatted.slice(5)}`;
-          }
-          setDataValidade(formatted);
-        }}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="DD/MM/AAAA"
+          value={dataValidade}
+          keyboardType="numeric"
+          maxLength={10}
+          onChangeText={(text) => {
+            let formatted = text.replace(/\D/g, '');
+            if (formatted.length > 2) {
+              formatted = `${formatted.slice(0, 2)}/${formatted.slice(2)}`;
+            }
+            if (formatted.length > 5) {
+              formatted = `${formatted.slice(0, 5)}/${formatted.slice(5)}`;
+            }
+            setDataValidade(formatted);
+          }}
+        />
 
-      <Text style={styles.label}>Descrição</Text>
-      <TextInput
-        style={[styles.input, { height: 80 }]}
-        placeholder="Digite uma descrição do produto"
-        value={descricao}
-        onChangeText={setDescricao}
-        multiline
-      />
+        <Text style={styles.label}>Descrição</Text>
+        <TextInput
+          style={[styles.input, { height: 80 }]}
+          placeholder="Digite uma descrição do produto"
+          value={descricao}
+          onChangeText={setDescricao}
+          multiline
+        />
 
-      <TouchableOpacity onPress={pickImage} style={styles.button}>
-        <Text style={styles.buttonText}>Selecionar Imagem</Text>
-      </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={styles.image} />}
+        <TouchableOpacity onPress={pickImage} style={styles.button}>
+          <Text style={styles.buttonText}>Selecionar Imagem</Text>
+        </TouchableOpacity>
+        {image && <Image source={{ uri: image }} style={styles.image} />}
+      </ScrollView>
 
-      <Button title={uploading ? 'Cadastrando...' : 'Cadastrar Produto'} onPress={cadastrarProduto} disabled={uploading} />
-    </ScrollView>
+      <View style={styles.fixedButtonsContainer}>
+        <TouchableOpacity style={styles.registerButton} onPress={cadastrarProduto}>
+          <Text style={styles.registerButtonText}>Cadastrar Produto</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('listItem')}>
+          <Text style={styles.backButtonText}>Voltar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f8f8f8',
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 100, // Espaço extra para evitar sobreposição
   },
   title: {
     fontSize: 24,
@@ -184,13 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-  },
-  picker: {
-    backgroundColor: '#ffffff', // Fundo branco
-    borderWidth: 1,
-    borderColor: '#cccccc',
-    borderRadius: 8,
-    marginBottom: 15,
   },
   input: {
     height: 60,
@@ -218,6 +220,37 @@ const styles = StyleSheet.create({
     height: 100,
     marginVertical: 10,
     borderRadius: 8,
+  },
+  fixedButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#f0f0f0',
+  },
+  registerButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  backButton: {
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

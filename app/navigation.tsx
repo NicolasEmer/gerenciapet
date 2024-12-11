@@ -13,14 +13,15 @@ import AnimalListScreen from './(tabs)/listAnimais';
 import ListarProduto from './(tabs)/listItem';
 import CadProduto from './(tabs)/createItem';
 import ReportarLocAnimal from './(tabs)/createLocAnimaisRua';
-import ListagemLocAnimaisRua from './(tabs)/listLocAnimaisRua';
+import LocationListScreen from './(tabs)/listLocAnimaisRua';
 
 export type RootStackParamList = {
+  listLocAnimaisRua: undefined;
   createItem: undefined;
   listItem: undefined;
   listAnimais: undefined;
   Home: undefined;
-  ReportarLocAnimal: undefined;
+  createLocAnimaisRua: undefined;
   createAnimais: undefined;
   index: undefined;
   doacoes: undefined;
@@ -28,7 +29,6 @@ export type RootStackParamList = {
   AdicionarEvento: undefined;
   EditarEvento: { id: string }; // Aceita parâmetro `id`
   cad: undefined;
-  listagem: undefined;
   objetos: undefined;
 };
 
@@ -44,8 +44,8 @@ const Navigation = () => {
           options={{ title: 'Cadastrar Animais' }}
         />
         <Stack.Screen
-          name="listagem"
-          component={ListagemLocAnimaisRua}
+          name="listLocAnimaisRua"
+          component={LocationListScreen}
           options={{ title: 'Listagem Localicação Animais' }}
         />
         <Stack.Screen
@@ -69,7 +69,7 @@ const Navigation = () => {
           options={{ title: 'Gerencia Pet' }}
         />
         <Stack.Screen
-          name="ReportarLocAnimal"
+          name="createLocAnimaisRua"
           component={ReportarLocAnimal}
           options={{ title: 'Localizacao Animais' }}
         />

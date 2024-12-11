@@ -12,7 +12,7 @@ import { RootStackParamList } from '../navigation';
 console.log('FOIIII!');
 
 const ReportarLocAnimal = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'ReportarLocAnimal'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'createLocAnimaisRua'>>();
 
   const [animalType, setAnimalType] = useState<string>('');
   const [breed, setBreed] = useState<string>('');

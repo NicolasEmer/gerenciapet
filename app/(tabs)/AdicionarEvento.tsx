@@ -135,12 +135,56 @@ const AdicionarEvento = () => {
         <Marker coordinate={mapRegion} />
       </MapView>
 
-      <Button title="Salvar" onPress={adicionarEvento} />
+      <TouchableOpacity style={styles.registerButton} onPress={adicionarEvento}>
+        <Text style={styles.registerButtonText}>Adicionar Evento</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('eventos')}>
+        <Text style={styles.backButtonText}>Voltar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  registerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     padding: 20,

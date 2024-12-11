@@ -8,6 +8,7 @@ import { Picker } from '@react-native-picker/picker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import Home from './Home';
 
 interface Animal {
   id: string;
@@ -266,11 +267,34 @@ export default function AnimalListScreen() {
       <TouchableOpacity style={styles.registerButton} onPress={handleRegisterAnimal}>
         <Text style={styles.registerButtonText}>Cadastrar Animal</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.backButtonText}>Voltar</Text>
+      </TouchableOpacity>          
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  
 
   registerButton: {
     position: 'absolute',

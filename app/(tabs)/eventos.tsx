@@ -105,17 +105,76 @@ const Eventos = () => {
               </View>
             </View>
           )}
+          contentContainerStyle={styles.listContent}
         />
       )}
-      <Button
-        title="Adicionar Evento"
-        onPress={() => navigation.navigate('AdicionarEvento')}
-      />
+      <View style={styles.fixedButtonsContainer}>
+      <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('AdicionarEvento')}>
+        <Text style={styles.registerButtonText}>Adicionar Evento</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.backButtonText}>Voltar</Text>
+      </TouchableOpacity>       
+      </View> 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  listContent: {
+    paddingBottom: 100, // Espaço extra para evitar que a lista fique escondida sob os botões
+  },
+
+  fixedButtonsContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#f0f0f0', // Cor de fundo para destacar a área dos botões
+  },
+
+  registerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     padding: 20,

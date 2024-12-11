@@ -41,7 +41,7 @@ const Home = () => {
 
       <TouchableOpacity
         style={styles.buttoni}
-        onPress={() => navigation.navigate('listagem')}
+        onPress={() => navigation.navigate('listLocAnimaisRua')}
       >
         <Text style={styles.buttonText}>Lista de animais perdidos</Text>
       </TouchableOpacity>

@@ -159,11 +159,34 @@ export default function AnimalRegistrationScreen() {
       <View style={styles.buttonContainer}>
         <Button title="Cadastrar Animal" onPress={handleRegistration} />
       </View>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('listAnimais')}>
+        <Text style={styles.backButtonText}>Voltar</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     justifyContent: 'center',

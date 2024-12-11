@@ -171,12 +171,57 @@ const EditarEvento = () => {
         <Marker coordinate={{ latitude: tempMapRegion.latitude, longitude: tempMapRegion.longitude }} />
       </MapView>
 
-      <Button title="Salvar Alterações" onPress={atualizarEvento} />
+      <TouchableOpacity style={styles.registerButton} onPress={atualizarEvento}>
+        <Text style={styles.registerButtonText}>Salvar Alterações</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('eventos')}>
+        <Text style={styles.backButtonText}>Voltar</Text>
+      </TouchableOpacity>
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  registerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     padding: 20,
