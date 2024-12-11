@@ -17,14 +17,24 @@ const AdicionarEvento = () => {
   const [data, setData] = useState<string>('');
   const [local, setLocal] = useState<string>('');
   const [image, setImage] = useState<string | null>(null);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [mapRegion, setMapRegion] = useState({
     latitude: -23.55052, // Posição inicial em São Paulo, por exemplo
     longitude: -46.633308,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [tempMapRegion, setTempMapRegion] = useState({
+    latitude: -23.55052, // Posição inicial em São Paulo
+    longitude: -46.633308,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const [markerPosition, setMarkerPosition] = useState({
+    latitude: -23.55052,
+    longitude: -46.633308,
+  });
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -32,14 +42,17 @@ const AdicionarEvento = () => {
         Alert.alert('Permissão negada', 'Permita o acesso à localização para selecionar o local do evento.');
         return;
       }
-
+  
       let userLocation = await Location.getCurrentPositionAsync({});
-      setLocation(userLocation);
-      setMapRegion({
-        ...mapRegion,
-        latitude: userLocation.coords.latitude,
-        longitude: userLocation.coords.longitude,
-      });
+      const { latitude, longitude } = userLocation.coords;
+  
+      setLatitude(latitude);
+      setLongitude(longitude);
+      setTempMapRegion((prev) => ({
+        ...prev,
+        latitude,
+        longitude,
+      }));
     })();
   }, []);
 
@@ -62,7 +75,7 @@ const AdicionarEvento = () => {
         Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
         return;
       }
-
+  
       let imageUrl = '';
       if (image) {
         const imageRef = ref(storage, `eventos/${nome}_${Date.now()}.jpg`);
@@ -71,16 +84,16 @@ const AdicionarEvento = () => {
         await uploadBytes(imageRef, bytes);
         imageUrl = await getDownloadURL(imageRef);
       }
-
+  
       const eventoData = {
         nome,
         data,
         local,
         imageUrl,
-        latitude: mapRegion.latitude,
-        longitude: mapRegion.longitude,
+        latitude: tempMapRegion.latitude,
+        longitude: tempMapRegion.longitude,
       };
-
+  
       await addDoc(collection(db, 'eventos'), eventoData);
       Alert.alert('Sucesso', 'Evento cadastrado com sucesso!');
       navigation.navigate('eventos');
@@ -92,11 +105,12 @@ const AdicionarEvento = () => {
 
   const handleMapPress = (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
-    setMapRegion({
-      ...mapRegion,
+  
+    setTempMapRegion((prev) => ({
+      ...prev,
       latitude,
       longitude,
-    });
+    }));
   };
 
   return (
@@ -129,10 +143,10 @@ const AdicionarEvento = () => {
 
       <MapView
         style={styles.map}
-        region={mapRegion}
+        region={tempMapRegion}
         onPress={handleMapPress}
       >
-        <Marker coordinate={mapRegion} />
+        <Marker coordinate={tempMapRegion} />
       </MapView>
 
       <TouchableOpacity style={styles.registerButton} onPress={adicionarEvento}>
