@@ -122,8 +122,13 @@ const ReportarLocAnimal = () => {
         </Text>
       )}
 
-      <View style={styles.buttonContainer}>
-        <Button title="Reportar Animal" onPress={handleRegistration} />
+      <View style={styles.fixedButtonsContainer}>
+        <TouchableOpacity style={styles.registerButton} onPress={handleRegistration}>
+          <Text style={styles.registerButtonText}>Reportar Animal</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('listLocAnimaisRua')}>
+          <Text style={styles.backButtonText}>Voltar</Text>
+        </TouchableOpacity>
       </View>
 
       <Modal visible={mapVisible} animationType="slide" transparent={false}>
@@ -148,7 +153,7 @@ const ReportarLocAnimal = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     padding: 16,
     backgroundColor: '#f9f9f9',
   },
@@ -180,8 +185,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: 'italic',
   },
-  buttonContainer: {
-    marginTop: 16,
+  fixedButtonsContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'transparent',
+  },
+  backButton: {
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  registerButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

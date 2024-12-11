@@ -1,14 +1,17 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 
 const Home = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList,'Home'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Home'>>();
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../assets/images/logo.png')}
+      />
       <Text style={styles.title}>Bem-vindo ao GerenciaPet</Text>
 
       <TouchableOpacity
@@ -50,6 +53,11 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

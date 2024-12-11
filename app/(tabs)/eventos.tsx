@@ -127,14 +127,11 @@ const styles = StyleSheet.create({
   },
 
   fixedButtonsContainer: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#f0f0f0', // Cor de fundo para destacar a área dos botões
+    backgroundColor: '#f0f0f0',
   },
 
   registerButton: {

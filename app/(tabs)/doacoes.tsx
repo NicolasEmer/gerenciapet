@@ -4,6 +4,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../config/firebaseConfig'; // Importa a configuração Firebase
+import navigation, { RootStackParamList } from '../navigation';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from 'expo-router';
 
 const doacoes: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -14,6 +17,7 @@ const doacoes: React.FC = () => {
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [editingMethod, setEditingMethod] = useState<any>(null);
   const [viewingMethod, setViewingMethod] = useState<any>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'doacoes'>>();
 
   useEffect(() => {
     fetchPaymentMethods();
@@ -125,12 +129,12 @@ const doacoes: React.FC = () => {
         ListFooterComponent={
           <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
             <Text style={styles.addButtonText}>Adicionar Meio de Doação</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>        
         }
       />
-
-      
-
+    <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+      <Text style={styles.backButtonText}>Voltar</Text>
+    </TouchableOpacity>
       {/* Modal para visualizar método de pagamento */}
       <Modal animationType="slide" transparent={true} visible={viewModalVisible} onRequestClose={() => setViewModalVisible(false)}>
         <View style={styles.modalContainer}>
@@ -191,6 +195,25 @@ const doacoes: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#ff4444',
+    borderRadius: 50,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
     justifyContent: 'flex-start',

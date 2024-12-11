@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 import { Picker } from '@react-native-picker/picker';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const ListarProduto = () => {
   const [nome, setNome] = useState('');
@@ -30,9 +32,11 @@ const ListarProduto = () => {
     { label: 'Acessórios', value: 'Acessórios' },
   ];
 
-  useEffect(() => {
-    listarProdutos();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      listarProdutos();
+    }, []) 
+  );
 
   const listarProdutos = async () => {
     try {
