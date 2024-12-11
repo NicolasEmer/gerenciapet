@@ -15,7 +15,7 @@ import {
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import MapView, { Marker, MapPressEvent } from 'react-native-maps';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 import * as ImagePicker from 'expo-image-picker';
@@ -55,9 +55,11 @@ const LocationListScreen = () => {
   const [editDescription, setEditDescription] = useState('');
   const [editImage, setEditImage] = useState('');
 
-  useEffect(() => {
-    fetchLocations();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchLocations();
+    }, []) 
+  );
   
   const fetchLocations = async () => {
     try {

@@ -72,7 +72,7 @@ const ReportarLocAnimal = () => {
 
       await addDoc(collection(db, 'reportedAnimals'), animalData);
       Alert.alert('Sucesso', 'Localização do animal registrada com sucesso!');
-      navigation.navigate('Home');
+      navigation.navigate('listLocAnimaisRua');
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao registrar a localização do animal.');
       console.error('Erro ao registrar animal:', error);

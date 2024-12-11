@@ -35,9 +35,11 @@ export default function AnimalListScreen() {
   const [image, setImage] = useState<string | null>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'listAnimais'>>();
 
-  useEffect(() => {
-    fetchAnimals();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchAnimals();
+    }, []) 
+  );
 
   const fetchAnimals = async () => {
     try {
